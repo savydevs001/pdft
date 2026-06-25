@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title><%= reportNumber %> — <%= fullAddress %></title>
+<style>
+:root {
+  /* ── Theme (injected at render time) ── */
+  <%= __themeCSS %>
+
+  /* ── Body palette ── */
+  --color-page-bg:    #FFFFFF;
+  --color-body-text:  #1C2B3A;
+  --color-muted:      #5A6A7A;
+  --color-border:     #D8E3EC;
+  --color-row-alt:    #F4F8FB;
+
+  /* ── Severity ── */
+  --sev-none-clr:   #2D7A4F; --sev-none-bg:   #EAF7EF;
+  --sev-minor-clr:  #B58A00; --sev-minor-bg:  #FEFAE8;
+  --sev-mod-clr:    #C0520A; --sev-mod-bg:    #FEF3EA;
+  --sev-major-clr:  #B91C1C; --sev-major-bg:  #FEF0F0;
+  --sev-maint-clr:  #1D4ED8; --sev-maint-bg:  #EEF3FF;
+
+  /* ── Typography ── */
+  --font: 'Arial', 'Helvetica Neue', sans-serif;
+
+  /* ── Page — US Letter ── */
+  --page-w: 8.5in;
+  --page-h: 11in;
+  --ph:     0.60in;   /* horizontal padding */
+  --pv:     0.50in;   /* vertical padding */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  font-size: 9.5pt;
+  color: var(--color-body-text);
+  background: #8C9BA8;
+  line-height: 1.55;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ══ PAGE SHELL ══════════════════════════════════════════════════ */
+.page {
+  width: var(--page-w);
+  min-height: var(--page-h);
+  background: var(--color-page-bg);
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 32px rgba(0,0,0,.28);
+  page-break-after: always;
+}
+
+@media print {
+  body { background: none; }
+  .page { margin: 0; box-shadow: none; page-break-after: always; }
+}
+
+/* ══ SHARED HEADER ═══════════════════════════════════════════════ */
+.ph {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  padding: 10px var(--ph);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.ph-logo { display: flex; align-items: center; gap: 10px; }
+.logo-badge {
+  width: 38px; height: 38px; border-radius: 7px;
+  background: var(--color-logo-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 13px; color: #fff;
+  letter-spacing: -.5px; flex-shrink: 0; overflow: hidden;
+}
+.logo-badge img { width: 100%; height: 100%; object-fit: cover; }
+.ph-divider { width: 1px; height: 30px; background: rgba(255,255,255,.22); }
+.ph-name h1 { font-size: 11pt; font-weight: 800; letter-spacing: .01em; }
+.ph-name p  { font-size: 7pt;  opacity: .72; margin-top: 1px; }
+.ph-meta    { text-align: right; }
+.ph-meta-row { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.ph-meta-lbl { font-size: 6.5pt; opacity: .62; letter-spacing: .06em; text-transform: uppercase; }
+.ph-meta-val { font-size: 8pt;   font-weight: 700; }
+.accent-bar  { height: 3px; background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark)); flex-shrink: 0; }
+
+/* ══ PAGE CONTENT WRAPPER ════════════════════════════════════════ */
+.pc { flex: 1; padding: var(--pv) var(--ph); overflow: hidden; }
+
+/* ══ SECTION HEADING ═════════════════════════════════════════════ */
+.sh {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.sh-bar { width: 4px; height: 22px; background: var(--color-accent); border-radius: 2px; flex-shrink: 0; }
+.sh h2  { font-size: 12.5pt; font-weight: 800; color: var(--color-body-text); flex: 1; }
+.sh-num { font-size: 7pt; font-weight: 700; color: var(--color-accent); letter-spacing: .10em; text-transform: uppercase; }
+
+/* ══ SHARED FOOTER ═══════════════════════════════════════════════ */
+.pf {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  padding: 7px var(--ph);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+  border-top: 3px solid var(--color-accent);
+}
+.pf-co  { font-size: 7pt; font-weight: 700; opacity: .85; }
+.pf-leg { font-size: 6pt; opacity: .50; text-align: center; flex: 1; padding: 0 12px; }
+.pf-pg  { font-size: 7pt; letter-spacing: .06em; opacity: .72; }
+.pf-pg strong { color: #fff; font-size: 8.5pt; }
+
+/* ══ INFO TABLE ══════════════════════════════════════════════════ */
+.info-tbl { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.info-tbl tr:nth-child(even) td { background: var(--color-row-alt); }
+.info-tbl td { padding: 6px 10px; vertical-align: top; }
+.info-tbl td.lbl {
+  width: 34%;
+  font-size: 7.5pt; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--color-muted); white-space: nowrap;
+}
+.info-tbl td.val { font-size: 9pt; color: var(--color-body-text); }
+.sec-rule { border: none; border-top: 1px solid var(--color-border); margin: 18px 0; }
+
+/* ══ PIPE TAGS ═══════════════════════════════════════════════════ */
+.pipe-tag {
+  display: inline-block;
+  padding: 2px 9px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 7.5pt; font-weight: 700;
+  border-radius: 3px; margin: 2px 3px 2px 0;
+  letter-spacing: .04em;
+}
+
+/* ══ VIDEO LINKS ═════════════════════════════════════════════════ */
+.video-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  background: var(--color-row-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-accent); font-size: 8pt; font-weight: 600;
+  text-decoration: none; margin: 2px 4px 2px 0;
+}
+.video-link::before { content: '▶'; font-size: 7pt; }
+
+/* ══ TOC ═════════════════════════════════════════════════════════ */
+.toc-list { list-style: none; }
+.toc-grp  {
+  font-size: 6.5pt; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-accent); margin: 14px 0 5px;
+}
+.toc-item {
+  display: flex; align-items: baseline; gap: 0;
+  padding: 5px 0; border-bottom: 1px solid var(--color-border);
+}
+.toc-lbl  { font-size: 9.5pt; color: var(--color-body-text); white-space: nowrap; }
+.toc-dots { flex: 1; border-bottom: 2px dotted var(--color-border); margin: 0 8px; position: relative; top: -3px; }
+.toc-pg   { font-size: 9pt; font-weight: 700; color: var(--color-body-text); white-space: nowrap; }
+
+/* ══ SEVERITY SCALE ══════════════════════════════════════════════ */
+.sev-block {
+  display: flex; gap: 12px;
+  border-left: 4px solid;
+  padding: 10px 12px;
+  border-radius: 0 5px 5px 0;
+  margin-bottom: 10px;
+}
+.sev-block.sev-none  { border-color: var(--sev-none-clr);  background: var(--sev-none-bg); }
+.sev-block.sev-minor { border-color: var(--sev-minor-clr); background: var(--sev-minor-bg); }
+.sev-block.sev-mod   { border-color: var(--sev-mod-clr);   background: var(--sev-mod-bg); }
+.sev-block.sev-major { border-color: var(--sev-major-clr); background: var(--sev-major-bg); }
+.sev-block.sev-maint { border-color: var(--sev-maint-clr); background: var(--sev-maint-bg); }
+.sev-icon  { font-size: 18pt; flex-shrink: 0; line-height: 1; }
+.sev-title { font-size: 10pt; font-weight: 800; }
+.sev-sub   { font-size: 7.5pt; opacity: .7; margin-bottom: 4px; }
+.sev-body  { font-size: 8.5pt; }
+.sev-eg    { margin-top: 4px; font-style: italic; font-size: 7.5pt; opacity: .75; }
+
+/* ══ CAMERA LOG TABLE ════════════════════════════════════════════ */
+.obs-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.obs-table thead td {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  font-size: 7pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 10px;
+}
+.obs-table tbody tr { border-bottom: 1px solid var(--color-border); }
+.obs-table tbody tr:nth-child(even) { background: var(--color-row-alt); }
+.obs-table td { padding: 7px 10px; vertical-align: top; font-size: 8.5pt; }
+.obs-table td.obs-time { white-space: nowrap; font-weight: 700; width: 60px; }
+.obs-table td.obs-feet { white-space: nowrap; width: 55px; text-align: center; }
+.obs-table td.obs-sev  { width: 120px; }
+.obs-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 7.5pt; font-weight: 700;
+  padding: 2px 7px; border-radius: 3px;
+}
+.obs-badge.sev-none  { color: var(--sev-none-clr);  background: var(--sev-none-bg); }
+.obs-badge.sev-minor { color: var(--sev-minor-clr); background: var(--sev-minor-bg); }
+.obs-badge.sev-mod   { color: var(--sev-mod-clr);   background: var(--sev-mod-bg); }
+.obs-badge.sev-major { color: var(--sev-major-clr); background: var(--sev-major-bg); }
+.obs-badge.sev-maint { color: var(--sev-maint-clr); background: var(--sev-maint-bg); }
+.obs-photos { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.obs-photos img { height: 72px; width: 96px; object-fit: cover; border-radius: 3px; border: 1px solid var(--color-border); }
+
+/* ══ DEFECT PAGE ═════════════════════════════════════════════════ */
+.defect { border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; }
+.defect-hd { display: flex; }
+.defect-stripe { width: 6px; flex-shrink: 0; }
+.defect-stripe.stripe-none  { background: var(--sev-none-clr);  }
+.defect-stripe.stripe-minor { background: var(--sev-minor-clr); }
+.defect-stripe.stripe-mod   { background: var(--sev-mod-clr);   }
+.defect-stripe.stripe-major { background: var(--sev-major-clr); }
+.defect-stripe.stripe-maint { background: var(--sev-maint-clr); }
+.defect-hd-c {
+  flex: 1; display: flex; align-items: flex-start;
+  justify-content: space-between; padding: 12px 14px;
+  background: var(--color-row-alt);
+}
+.defect-num  { font-size: 7pt; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: var(--color-muted); }
+.defect-ttl  { font-size: 13pt; font-weight: 800; color: var(--color-body-text); margin: 3px 0; }
+.defect-loc  { font-size: 8pt; color: var(--color-muted); }
+.defect-loc span { font-weight: 700; color: var(--color-body-text); }
+.defect-badge {
+  text-align: center; font-size: 8pt; font-weight: 700;
+  padding: 8px 12px; border-radius: 5px; flex-shrink: 0;
+  line-height: 1.4; white-space: nowrap;
+}
+.defect-badge-icon { display: block; font-size: 16pt; margin-bottom: 2px; }
+.badge-none  { color: var(--sev-none-clr);  background: var(--sev-none-bg); }
+.badge-minor { color: var(--sev-minor-clr); background: var(--sev-minor-bg); }
+.badge-mod   { color: var(--sev-mod-clr);   background: var(--sev-mod-bg); }
+.badge-major { color: var(--sev-major-clr); background: var(--sev-major-bg); }
+.badge-maint { color: var(--sev-maint-clr); background: var(--sev-maint-bg); }
+.defect-body { padding: 14px; font-size: 9.5pt; line-height: 1.6; }
+
+/* ══ PHOTO GRID ══════════════════════════════════════════════════ */
+.photo-grid {
+  display: grid; gap: 8px; margin-top: 14px;
+}
+.photo-grid.cols-1 { grid-template-columns: 1fr; }
+.photo-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.photo-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.photo-cell { position: relative; border-radius: 4px; overflow: hidden; border: 1px solid var(--color-border); }
+.photo-cell img { width: 100%; height: 180px; object-fit: cover; display: block; }
+.photo-grid.cols-1 .photo-cell img { height: 260px; }
+.photo-num {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(13,33,55,.62); color: #fff;
+  font-size: 6.5pt; font-weight: 700; letter-spacing: .08em;
+  text-align: center; padding: 3px 0;
+}
+
+/* ══ RECOMMENDATIONS ═════════════════════════════════════════════ */
+.rec-list { list-style: none; }
+.rec-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0; border-bottom: 1px solid var(--color-border);
+  font-size: 9.5pt;
+}
+.rec-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--color-accent); color: #fff;
+  font-size: 8pt; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.notes { font-size: 9.5pt; line-height: 1.7; color: var(--color-body-text); }
+
+/* ══ STATEMENT OF SERVICE ════════════════════════════════════════ */
+.legal-text { font-size: 9pt; line-height: 1.75; color: var(--color-body-text); }
+.legal-text p { margin-bottom: 12px; }
+.legal-text p:last-child { margin-bottom: 0; }
+
+/* ══ PIPE MATERIALS TABLE ════════════════════════════════════════ */
+.mat-table { width: 100%; border-collapse: collapse; }
+.mat-table thead td {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  font-size: 8pt; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; padding: 8px 14px;
+}
+.mat-table tbody tr:nth-child(even) { background: var(--color-row-alt); }
+.mat-table tbody td { padding: 6px 14px; font-size: 9pt; border-bottom: 1px solid var(--color-border); }
+.mat-table tbody td:last-child { font-weight: 700; text-align: right; color: var(--color-accent); }
+.mat-note { margin-top: 14px; padding: 10px 14px; background: var(--color-row-alt); border-left: 4px solid var(--color-accent); border-radius: 0 4px 4px 0; font-size: 8.5pt; line-height: 1.6; }
+.mat-note strong { display: block; margin-bottom: 4px; }
+
+/* ══ DEFECTS GRAPHIC PAGE ════════════════════════════════════════ */
+.graphic-wrap { width: 100%; margin-top: 10px; }
+.graphic-wrap img { width: 100%; border-radius: 5px; border: 1px solid var(--color-border); }
+
+/* ══ INSPECTOR BIO ════════════════════════════════════════════════ */
+.bio-headline { font-size: 9.5pt; line-height: 1.7; margin-bottom: 14px; }
+.bio-section  { margin-bottom: 16px; }
+.bio-section h3 { font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--color-muted); margin-bottom: 7px; }
+.bio-list { list-style: none; }
+.bio-list li {
+  padding: 4px 0 4px 14px; font-size: 9pt; line-height: 1.5;
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+.bio-list li::before { content: '—'; position: absolute; left: 0; color: var(--color-accent); font-weight: 700; }
+.bio-footer { margin-top: 20px; text-align: center; padding-top: 16px; border-top: 2px solid var(--color-accent); }
+.bio-footer .biz-name { font-size: 14pt; font-weight: 800; }
+.bio-footer .biz-tagline { font-size: 9pt; color: var(--color-muted); margin: 4px 0 8px; }
+.bio-footer .biz-contact { font-size: 11pt; font-weight: 700; color: var(--color-accent); }
+.bio-footer .biz-web { font-size: 9pt; color: var(--color-muted); text-decoration: underline; }
+
+/* ══ COVER PAGE ══════════════════════════════════════════════════ */
+.cover-header {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  padding: 22px var(--ph) 18px;
+  display: flex; align-items: center; gap: 14px;
+  flex-shrink: 0;
+}
+.cover-logo-badge {
+  width: 52px; height: 52px; border-radius: 10px;
+  background: var(--color-logo-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 18px; color: #fff;
+  letter-spacing: -.5px; flex-shrink: 0; overflow: hidden;
+}
+.cover-logo-badge img { width: 100%; height: 100%; object-fit: cover; }
+.cover-logo-divider { width: 1px; height: 42px; background: rgba(255,255,255,.22); }
+.cover-name h1 { font-size: 18pt; font-weight: 900; letter-spacing: -.01em; }
+.cover-name p  { font-size: 9pt; opacity: .68; margin-top: 2px; }
+.cover-accent  { height: 4px; background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark)); flex-shrink: 0; }
+
+.cover-photo-wrap {
+  flex: 1; overflow: hidden; position: relative;
+  background: var(--color-row-alt);
+  display: flex; align-items: center; justify-content: center;
+}
+.cover-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.cover-photo-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(13,33,55,.58); color: #fff;
+  text-align: center; font-size: 8pt; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 0;
+}
+.cover-meta {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  padding: 16px var(--ph);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+  flex-shrink: 0;
+}
+.cover-meta-item { display: flex; flex-direction: column; gap: 1px; }
+.cover-meta-lbl  { font-size: 6.5pt; opacity: .55; letter-spacing: .10em; text-transform: uppercase; }
+.cover-meta-val  { font-size: 9.5pt; font-weight: 700; }
+.cover-address-block {
+  text-align: center; padding: 10px var(--ph);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.cover-address-block .address-main { font-size: 13pt; font-weight: 800; }
+.cover-address-block .address-city { font-size: 9.5pt; color: var(--color-muted); }
+.cover-contact {
+  text-align: center; padding: 10px;
+  flex-shrink: 0;
+  background: var(--color-row-alt);
+  border-top: 1px solid var(--color-border);
+}
+.cover-contact .tagline     { font-size: 9pt; font-style: italic; color: var(--color-muted); }
+.cover-contact .phone       { font-size: 13pt; font-weight: 800; color: var(--color-body-text); margin: 3px 0; }
+.cover-contact .website     { font-size: 8.5pt; color: var(--color-accent); }
+.cover-legal {
+  padding: 8px var(--ph);
+  font-size: 6.5pt; color: var(--color-muted);
+  text-align: center; line-height: 1.5;
+  flex-shrink: 0;
+}
+
+/* ══ PROPERTY PHOTO ON CLIENT PAGE ════════════════════════════════ */
+.client-layout { display: grid; grid-template-columns: 1fr 200px; gap: 16px; align-items: start; }
+.client-photo  { border-radius: 5px; overflow: hidden; border: 1px solid var(--color-border); }
+.client-photo img { width: 100%; height: 130px; object-fit: cover; display: block; }
+.client-photo-label { font-size: 6.5pt; font-weight: 700; letter-spacing: .06em; text-align: center; padding: 4px; background: var(--color-row-alt); color: var(--color-muted); }
+</style>
+</head>
+<body>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="cover-header">
+    <div class="cover-logo-badge">
+      <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %>
+    </div>
+    <div class="cover-logo-divider"></div>
+    <div class="cover-name">
+      <h1><%= companyName %></h1>
+      <p><%= companyTagline %></p>
+    </div>
+  </div>
+  <div class="cover-accent"></div>
+
+  <div class="cover-address-block">
+    <div class="address-main"><%= propertyAddress %></div>
+    <div class="address-city"><%= propertyCity %></div>
+  </div>
+
+  <div class="cover-photo-wrap">
+    <img src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/1200x800/1C2B3A/5A6A7A?text=Property+Photo' %>" alt="Property Photo">
+    <div class="cover-photo-label"><%= propertyPhotoLabel || 'Front Elevation' %></div>
+  </div>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span class="cover-meta-lbl">Report No.</span><span class="cover-meta-val"><%= reportNumber %></span></div>
+    <div class="cover-meta-item"><span class="cover-meta-lbl">File No.</span><span class="cover-meta-val"><%= fileNumber %></span></div>
+    <div class="cover-meta-item"><span class="cover-meta-lbl">Date of Inspection</span><span class="cover-meta-val"><%= inspectionDate %></span></div>
+    <div class="cover-meta-item"><span class="cover-meta-lbl">Inspector</span><span class="cover-meta-val"><%= inspectorName %></span></div>
+  </div>
+
+  <div class="cover-contact">
+    <div class="tagline">Don't Let Your Drain Be A Pain!</div>
+    <div class="phone"><%= companyPhone || '' %></div>
+    <div class="website"><%= companyWebsite || '' %></div>
+  </div>
+
+  <div class="cover-legal"><%= footerLegal %></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 2 — TABLE OF CONTENTS
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Table of Contents</h2></div>
+    <ul class="toc-list">
+      <li class="toc-grp">Preamble</li>
+      <li class="toc-item"><span class="toc-lbl">Cover Page</span><span class="toc-dots"></span><span class="toc-pg">01</span></li>
+      <li class="toc-item"><span class="toc-lbl">Table of Contents</span><span class="toc-dots"></span><span class="toc-pg">02</span></li>
+      <li class="toc-item"><span class="toc-lbl">Disclosure, Scope &amp; Point of Reference</span><span class="toc-dots"></span><span class="toc-pg">03</span></li>
+
+      <li class="toc-grp">Inspection Details</li>
+      <li class="toc-item"><span class="toc-lbl">Client &amp; Site Information</span><span class="toc-dots"></span><span class="toc-pg">04</span></li>
+      <li class="toc-item"><span class="toc-lbl">Defect Severity Classification</span><span class="toc-dots"></span><span class="toc-pg">05</span></li>
+      <% if (hasObservations) { %>
+      <li class="toc-item"><span class="toc-lbl">Sewer Pipe Conditions — Camera Log</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.observations).padStart(2,'0') %></span></li>
+      <% } %>
+
+      <% if (hasDefects) { %>
+      <li class="toc-grp">Defect Findings</li>
+      <% defects.forEach(function(d) { %>
+      <li class="toc-item">
+        <span class="toc-lbl"><%= d.severityIcon %> &nbsp;Defect <%= d.num %> — <%= d.title %></span>
+        <span class="toc-dots"></span>
+        <span class="toc-pg"><%= d.pageNum %></span>
+      </li>
+      <% }) %>
+      <% } %>
+
+      <li class="toc-grp">Summary &amp; Appendix</li>
+      <li class="toc-item"><span class="toc-lbl">Recommendations &amp; Notes</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.recommendations).padStart(2,'0') %></span></li>
+      <li class="toc-item"><span class="toc-lbl">Statement of Service</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.statementOfService).padStart(2,'0') %></span></li>
+      <% if (showMaterialsPage) { %>
+      <li class="toc-item"><span class="toc-lbl">Understanding Sewer Materials &amp; Defects</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.materials).padStart(2,'0') %></span></li>
+      <% } %>
+      <% if (showDefectsGraphic) { %>
+      <li class="toc-item"><span class="toc-lbl">Sewer Defects Graphic</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.defectsGraphic).padStart(2,'0') %></span></li>
+      <% } %>
+      <% if (showInspectorBio) { %>
+      <li class="toc-item"><span class="toc-lbl">Meet Your Inspector</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.inspectorBio).padStart(2,'0') %></span></li>
+      <% } %>
+    </ul>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong>02</strong></span>
+  </footer>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 3 — DISCLOSURE + SCOPE + POINT OF REFERENCE
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Sewer Line Inspection Disclosure</h2><span class="sh-num">Section 01</span></div>
+    <div class="legal-text"><%- disclosureText.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : '' }).join('') %></div>
+
+    <hr class="sec-rule">
+
+    <div class="sh"><div class="sh-bar"></div><h2>Scope of the Sewer Inspection</h2></div>
+    <div class="legal-text"><%- scopeText.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : '' }).join('') %></div>
+
+    <hr class="sec-rule">
+
+    <div class="sh"><div class="sh-bar"></div><h2>Point of Reference</h2></div>
+    <div class="legal-text"><%- pointOfReference.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : '' }).join('') %></div>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong>03</strong></span>
+  </footer>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 4 — CLIENT & SITE INFO + SEWER SYSTEM INFO
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Client &amp; Site Information</h2><span class="sh-num">Section 02</span></div>
+    <div class="client-layout">
+      <table class="info-tbl">
+        <tr><td class="lbl">File No.</td><td class="val"><%= fileNumber %></td></tr>
+        <tr><td class="lbl">Client Name</td><td class="val"><%= clientName %></td></tr>
+        <tr><td class="lbl">Property Address</td><td class="val"><%= fullAddress %></td></tr>
+        <tr><td class="lbl">Date of Inspection</td><td class="val"><%= inspectionDate %></td></tr>
+        <tr><td class="lbl">Time of Inspection</td><td class="val"><%= inspectionTime %></td></tr>
+        <tr><td class="lbl">Inspector</td><td class="val"><%= inspectorName %> &nbsp;—&nbsp; <%= inspectorLicense %></td></tr>
+        <tr><td class="lbl">People Present</td><td class="val"><%= peoplePresent %></td></tr>
+        <tr><td class="lbl">Buyer's Agent</td><td class="val"><%= buyersAgent %></td></tr>
+        <tr><td class="lbl">Building Occupied</td><td class="val"><%= buildingOccupied %></td></tr>
+        <tr><td class="lbl">Weather / Soil</td><td class="val"><%= weatherConditions %></td></tr>
+      </table>
+      <div>
+        <div class="client-photo">
+          <img src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/400x260/1C2B3A/5A6A7A?text=Property+Photo' %>" alt="Property">
+          <div class="client-photo-label"><%= propertyPhotoLabel || 'Front Elevation' %></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sec-rule">
+
+    <div class="sh"><div class="sh-bar"></div><h2>Sewer System Information</h2><span class="sh-num">Section 03</span></div>
+    <table class="info-tbl">
+      <tr>
+        <td class="lbl">Camera Entry / Cleanout</td>
+        <td class="val"><%= cleanoutLocation %><% if (cleanoutSize) { %> &nbsp;·&nbsp; <strong><%= cleanoutSize %></strong><% } %></td>
+      </tr>
+      <tr>
+        <td class="lbl">Pipe Material(s)</td>
+        <td class="val">
+          <% pipeTypes.forEach(function(p) { %><span class="pipe-tag"><%= p %></span><% }) %>
+        </td>
+      </tr>
+      <% if (sewerLength) { %>
+      <tr><td class="lbl">Total Run Length</td><td class="val"><%= sewerLength %> ft</td></tr>
+      <% } %>
+      <% if (cameraDirections) { %>
+      <tr><td class="lbl">Camera Direction(s)</td><td class="val"><%- cameraDirections.replace(/\n/g,'<br>') %></td></tr>
+      <% } %>
+      <% if (hasVideoLinks) { %>
+      <tr>
+        <td class="lbl">Inspection Videos</td>
+        <td class="val">
+          <% videoLinks.forEach(function(v) { %>
+          <a href="<%= v.url %>" class="video-link" target="_blank"><%= v.label %></a>
+          <% }) %>
+        </td>
+      </tr>
+      <% } %>
+      <% if (systemNotes && systemNotes.trim()) { %>
+      <tr><td class="lbl">System Notes</td><td class="val"><%= systemNotes %></td></tr>
+      <% } %>
+    </table>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong>04</strong></span>
+  </footer>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 5 — DEFECT SEVERITY CLASSIFICATION
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Defect Severity Classification Framework</h2><span class="sh-num">Section 04</span></div>
+
+    <div class="sev-block sev-none">
+      <span class="sev-icon">🟢</span>
+      <div><div class="sev-title">No Defect</div><div class="sev-sub">Informational</div>
+      <div class="sev-body"><%= sevNoneDef %><div class="sev-eg"><%= sevNoneEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-minor">
+      <span class="sev-icon">🟡</span>
+      <div><div class="sev-title">Minor Defect</div><div class="sev-sub">Monitor</div>
+      <div class="sev-body"><%= sevMinorDef %><div class="sev-eg"><%= sevMinorEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-mod">
+      <span class="sev-icon">🟠</span>
+      <div><div class="sev-title">Moderate Defect</div><div class="sev-sub">Recommended Action</div>
+      <div class="sev-body"><%= sevModDef %><div class="sev-eg"><%= sevModEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-major">
+      <span class="sev-icon">🔴</span>
+      <div><div class="sev-title">Major Defect</div><div class="sev-sub">Critical / Immediate Action</div>
+      <div class="sev-body"><%= sevMajorDef %><div class="sev-eg"><%= sevMajorEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-maint">
+      <span class="sev-icon">🔵</span>
+      <div><div class="sev-title">Suggested Maintenance</div><div class="sev-sub">Preventative Care</div>
+      <div class="sev-body"><%= sevMaintDef %><div class="sev-eg"><%= sevMaintEg %></div></div></div>
+    </div>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong>05</strong></span>
+  </footer>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 6 (optional) — SEWER PIPE CONDITIONS / CAMERA LOG
+════════════════════════════════════════════════════════ -->
+<% if (hasObservations) { %>
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Sewer Pipe Conditions</h2><span class="sh-num">Section 05 — Camera Log</span></div>
+    <table class="obs-table">
+      <thead>
+        <tr>
+          <td class="obs-time">Time</td>
+          <td class="obs-feet">Feet</td>
+          <td class="obs-sev">Condition</td>
+          <td>Observation</td>
+        </tr>
+      </thead>
+      <tbody>
+        <% observations.forEach(function(o) { %>
+        <tr>
+          <td class="obs-time"><%= o.time %></td>
+          <td class="obs-feet"><%= o.feet %> ft</td>
+          <td class="obs-sev">
+            <span class="obs-badge sev-<%= o.severityCss %>"><%= o.severityIcon %> <%= o.severityLabel %></span>
+          </td>
+          <td>
+            <%= o.note %>
+            <% if (o.photos && o.photos.length > 0) { %>
+            <div class="obs-photos">
+              <% o.photos.forEach(function(url) { %>
+              <img src="<%= url %>" alt="observation photo">
+              <% }) %>
+            </div>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong><%= String(pages.observations).padStart(2,'0') %></strong></span>
+  </footer>
+</div>
+<% } %>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGES 7+ — DEFECT FINDINGS (one page per defect)
+════════════════════════════════════════════════════════ -->
+<% defects.forEach(function(d, i) { %>
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh">
+      <div class="sh-bar"></div>
+      <h2>Defect Findings</h2>
+      <span class="sh-num">Section <%= hasObservations ? '06' : '05' %> — Finding <%= d.num %> of <%= defectCount %></span>
+    </div>
+
+    <div class="defect">
+      <div class="defect-hd">
+        <div class="defect-stripe stripe-<%= d.severityCss %>"></div>
+        <div class="defect-hd-c">
+          <div>
+            <div class="defect-num">Defect <%= d.num %></div>
+            <div class="defect-ttl"><%= d.title %></div>
+            <div class="defect-loc">At <span><%= d.time %> min</span> &nbsp;/&nbsp; <span><%= d.feet %> ft</span></div>
+          </div>
+          <div class="defect-badge badge-<%= d.severityCss %>">
+            <span class="defect-badge-icon"><%= d.severityIcon %></span>
+            <%= d.severityLabel %><br>
+            <span style="font-weight:400;font-size:6.5pt;"><%= d.severitySub %></span>
+          </div>
+        </div>
+      </div>
+      <div class="defect-body">
+        <%- d.narrative %>
+        <div class="photo-grid <%= d.gridClass %>">
+          <% d.photos.forEach(function(url, pi) { %>
+          <div class="photo-cell">
+            <img src="<%= url %>" alt="Photo <%= pi+1 %>">
+            <span class="photo-num">PHOTO <%= pi+1 %></span>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong><%= d.pageNum %></strong></span>
+  </footer>
+</div>
+<% }) %>
+
+
+<!-- ════════════════════════════════════════════════════════
+     RECOMMENDATIONS + ADDITIONAL NOTES
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>End of Report — Recommendations</h2><span class="sh-num">Section 06</span></div>
+    <% if (hasRecommendations) { %>
+    <ul class="rec-list">
+      <% recommendations.forEach(function(r, i) { %>
+      <li class="rec-item">
+        <div class="rec-num"><%= i+1 %></div>
+        <div><%= r %></div>
+      </li>
+      <% }) %>
+    </ul>
+    <% } else { %>
+    <p style="color:var(--color-muted);font-style:italic;">No specific recommendations at this time.</p>
+    <% } %>
+
+    <% if (hasAdditionalNotes) { %>
+    <hr class="sec-rule">
+    <div class="sh"><div class="sh-bar"></div><h2>Additional Notes</h2><span class="sh-num">Section 07</span></div>
+    <div class="notes"><%- additionalNotes %></div>
+    <% } %>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong><%= String(pages.recommendations).padStart(2,'0') %></strong></span>
+  </footer>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     STATEMENT OF SERVICE
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Statement of Service</h2></div>
+    <div class="legal-text"><%- statementOfService.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : '' }).join('') %></div>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong><%= String(pages.statementOfService).padStart(2,'0') %></strong></span>
+  </footer>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     UNDERSTANDING SEWER MATERIALS (optional)
+════════════════════════════════════════════════════════ -->
+<% if (showMaterialsPage) { %>
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Understanding Sewer Material &amp; Defects</h2></div>
+    <table class="mat-table">
+      <thead><tr><td>Pipe Material / Type</td><td style="text-align:right;">Life Expectancy</td></tr></thead>
+      <tbody>
+        <% pipeMaterials.forEach(function(m) { %>
+        <tr><td><%= m.type %></td><td><%= m.life %></td></tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <div class="mat-note">
+      <strong>* NOTE *</strong>
+      Life expectancy is for material alone and under ideal circumstances as intended from the manufacturer.
+      Construction and repair practices, soil erosion, settling, and root intrusion can drastically reduce
+      the expected timelines outlined above along with the overall performance of the sewer line.
+    </div>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong><%= String(pages.materials).padStart(2,'0') %></strong></span>
+  </footer>
+</div>
+<% } %>
+
+
+<!-- ════════════════════════════════════════════════════════
+     SEWER DEFECTS GRAPHIC (optional — only if URL provided)
+════════════════════════════════════════════════════════ -->
+<% if (showDefectsGraphic) { %>
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Sewer Defects Reference Graphic</h2></div>
+    <div class="graphic-wrap">
+      <img src="<%= defectsGraphicUrl %>" alt="Common Sewer Line Defects Diagram">
+    </div>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong><%= String(pages.defectsGraphic).padStart(2,'0') %></strong></span>
+  </footer>
+</div>
+<% } %>
+
+
+<!-- ════════════════════════════════════════════════════════
+     MEET YOUR INSPECTOR (optional)
+════════════════════════════════════════════════════════ -->
+<% if (showInspectorBio) { %>
+<div class="page">
+  <header class="ph">
+    <div class="ph-logo">
+      <div class="logo-badge"><% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %></div>
+      <div class="ph-divider"></div>
+      <div class="ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
+    </div>
+    <div class="ph-meta">
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val"><%= reportNumber %></span></div>
+      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val"><%= inspectionDate %></span></div>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Meet Your Inspector</h2></div>
+    <div style="font-size:10pt;font-weight:800;margin-bottom:8px;"><%= inspectorName %> &nbsp;<span style="font-weight:400;font-size:8.5pt;color:var(--color-muted);">— <%= inspectorLicense %></span></div>
+
+    <% if (inspectorBioHeadline) { %>
+    <div class="bio-headline"><%= inspectorBioHeadline %></div>
+    <% } %>
+
+    <% if (inspectorCredentials && inspectorCredentials.length > 0) { %>
+    <div class="bio-section">
+      <h3>Certifications &amp; Training</h3>
+      <ul class="bio-list">
+        <% inspectorCredentials.forEach(function(c) { %>
+        <li><%= c %></li>
+        <% }) %>
+      </ul>
+    </div>
+    <% } %>
+
+    <% if (inspectorExperience && inspectorExperience.length > 0) { %>
+    <div class="bio-section">
+      <h3>Industry Experience</h3>
+      <ul class="bio-list">
+        <% inspectorExperience.forEach(function(e) { %>
+        <li><%= e %></li>
+        <% }) %>
+      </ul>
+    </div>
+    <% } %>
+
+    <% if (inspectorWaysAndMeans) { %>
+    <div class="bio-section">
+      <h3>Ways &amp; Means</h3>
+      <div class="legal-text"><p><%= inspectorWaysAndMeans %></p></div>
+    </div>
+    <% } %>
+
+    <div class="bio-footer">
+      <div class="biz-name"><%= companyName %></div>
+      <div class="biz-tagline">Proudly Serving Las Vegas &amp; Henderson</div>
+      <div class="biz-contact"><%= companyPhone || '' %></div>
+      <div class="biz-web"><%= companyWebsite || '' %></div>
+    </div>
+  </div>
+
+  <footer class="pf">
+    <span class="pf-co"><%= companyName %></span>
+    <span class="pf-leg"><%= footerLegal %></span>
+    <span class="pf-pg">PAGE <strong><%= String(pages.inspectorBio).padStart(2,'0') %></strong></span>
+  </footer>
+</div>
+<% } %>
+
+
+</body>
+</html>

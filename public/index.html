@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Report Preview — LV Sewer Inspections</title>
+<script src="https://cdn.jsdelivr.net/npm/ejs@3.1.10/ejs.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0D1C28; color: #C8D8E4; display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ── */
+#sidebar {
+  width: 340px; flex-shrink: 0;
+  background: #091520; border-right: 1px solid #1A2E40;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+#sidebar-title {
+  padding: 14px 16px 12px; border-bottom: 1px solid #1A2E40;
+  font-size: 10.5pt; font-weight: 800; color: #fff; letter-spacing: .04em;
+  flex-shrink: 0;
+}
+#sidebar-title span { color: #1AAFB4; }
+#sidebar-title .subtitle { font-size: 7pt; font-weight: 400; color: #5A7A8A; margin-top: 2px; }
+
+/* Tabs */
+#tabs { display: flex; border-bottom: 1px solid #1A2E40; flex-shrink: 0; }
+.tab {
+  flex: 1; padding: 8px 4px; text-align: center;
+  font-size: 7pt; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: #5A7A8A; cursor: pointer; border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.tab.active { color: #1AAFB4; border-bottom-color: #1AAFB4; }
+.tab:hover:not(.active) { color: #8AAABB; }
+
+#controls { flex: 1; overflow-y: auto; }
+#controls::-webkit-scrollbar { width: 4px; }
+#controls::-webkit-scrollbar-thumb { background: #1A2E40; border-radius: 2px; }
+
+/* Tab panels */
+.tab-panel { display: none; padding: 12px 14px; }
+.tab-panel.active { display: block; }
+
+/* Form elements */
+.ctrl-section { margin-bottom: 20px; }
+.ctrl-section-title {
+  font-size: 6.5pt; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: #1AAFB4; margin-bottom: 8px; padding-bottom: 4px;
+  border-bottom: 1px solid #1A2E40;
+}
+label { display: block; font-size: 7pt; color: #7A9BAB; margin-bottom: 2px; margin-top: 7px; font-weight: 600; }
+input[type=text], input[type=url], input[type=tel], textarea, select {
+  width: 100%; background: #0F2030; border: 1px solid #1A2E40;
+  border-radius: 4px; color: #C8D8E4; font-size: 8pt;
+  padding: 5px 8px; outline: none; font-family: Arial, sans-serif;
+}
+input:focus, textarea:focus, select:focus { border-color: #1AAFB4; }
+textarea { resize: vertical; min-height: 52px; }
+input[type=color] {
+  width: 100%; height: 28px; border: 1px solid #1A2E40;
+  border-radius: 4px; cursor: pointer; background: #0F2030; padding: 2px;
+}
+.color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.checkbox-row { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
+.checkbox-row input[type=checkbox] { width: 14px; height: 14px; accent-color: #1AAFB4; flex-shrink: 0; }
+.checkbox-row label { margin: 0; font-size: 8pt; color: #C8D8E4; }
+
+/* Defect cards */
+.defect-card {
+  background: #0F2030; border: 1px solid #1A2E40;
+  border-radius: 5px; padding: 10px; margin-bottom: 8px;
+}
+.defect-card-hd {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.defect-card-title { font-size: 8pt; font-weight: 700; color: #fff; }
+.btn-remove {
+  background: #3A1C1C; border: 1px solid #6B2E2E; color: #E07070;
+  font-size: 7pt; padding: 2px 8px; border-radius: 3px; cursor: pointer;
+}
+.btn-remove:hover { background: #5A2020; }
+.photo-inputs { margin-top: 6px; }
+.photo-input-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.photo-input-row span { font-size: 7pt; color: #5A7A8A; width: 18px; text-align: center; }
+.photo-input-row input { flex: 1; }
+.btn-add-photo {
+  font-size: 7pt; color: #1AAFB4; background: none; border: none;
+  cursor: pointer; padding: 2px 0; margin-top: 2px;
+}
+
+/* Observation cards */
+.obs-card {
+  background: #0F2030; border: 1px solid #1A2E40;
+  border-radius: 5px; padding: 10px; margin-bottom: 8px;
+}
+.obs-card-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.obs-card-title { font-size: 8pt; font-weight: 700; color: #fff; }
+
+/* Rec rows */
+.rec-row { display: flex; gap: 5px; margin-bottom: 5px; align-items: flex-start; }
+.rec-row textarea { flex: 1; min-height: 36px; }
+.btn-rm-rec {
+  background: #3A1C1C; border: 1px solid #6B2E2E; color: #E07070;
+  font-size: 9pt; padding: 2px 7px; border-radius: 3px; cursor: pointer; flex-shrink: 0;
+}
+
+/* Add buttons */
+.btn-add {
+  width: 100%; padding: 7px; background: #0D2137;
+  border: 1px dashed #1A2E40; color: #1AAFB4;
+  font-size: 8pt; font-weight: 700; border-radius: 4px;
+  cursor: pointer; letter-spacing: .04em; margin-top: 4px;
+}
+.btn-add:hover { background: #132232; }
+
+/* Bottom bar */
+#bottom-bar {
+  padding: 10px 14px; border-top: 1px solid #1A2E40;
+  display: flex; gap: 8px; flex-shrink: 0;
+}
+#btn-render {
+  flex: 1; padding: 10px; background: #1AAFB4; border: none;
+  border-radius: 5px; color: #0D1C28; font-size: 9pt; font-weight: 800;
+  cursor: pointer; letter-spacing: .04em;
+}
+#btn-render:hover { background: #17C8CE; }
+#btn-pdf {
+  padding: 10px 14px; background: #1A3A4A; border: 1px solid #1A2E40;
+  border-radius: 5px; color: #C8D8E4; font-size: 9pt; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+#btn-pdf:hover { background: #1E4A5C; }
+#pdf-status { font-size: 7pt; color: #5A7A8A; text-align: center; margin-top: 4px; min-height: 14px; }
+
+/* ── Preview pane ── */
+#preview-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#preview-bar {
+  background: #091520; border-bottom: 1px solid #1A2E40;
+  padding: 8px 16px; display: flex; align-items: center; gap: 12px;
+  font-size: 8pt; color: #7A9BAB; flex-shrink: 0;
+}
+#preview-bar strong { color: #fff; }
+#preview-bar .hint { margin-left: auto; font-size: 7pt; color: #3A5A6A; }
+#preview-frame { flex: 1; border: none; background: #8C9BA8; }
+
+/* Error banner */
+#error-banner {
+  display: none; background: #3A1C1C; color: #E07070;
+  padding: 8px 16px; font-size: 8pt; border-top: 1px solid #6B2E2E;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-title">
+    Report <span>Preview</span>
+    <div class="subtitle">Fill in the form → click Render Preview</div>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tabs">
+    <div class="tab active" data-panel="panel-company">Company</div>
+    <div class="tab" data-panel="panel-report">Report</div>
+    <div class="tab" data-panel="panel-sewer">Sewer</div>
+    <div class="tab" data-panel="panel-defects">Defects</div>
+    <div class="tab" data-panel="panel-appendix">Appendix</div>
+  </div>
+
+  <div id="controls">
+
+    <!-- ── PANEL: COMPANY ── -->
+    <div class="tab-panel active" id="panel-company">
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Theme Colors</div>
+        <div class="color-row">
+          <div><label>Header / Footer BG</label><input type="color" id="colorHeaderBg" value="#0D2137"></div>
+          <div><label>Header Text</label><input type="color" id="colorHeaderText" value="#FFFFFF"></div>
+          <div><label>Accent</label><input type="color" id="colorAccent" value="#1AAFB4"></div>
+          <div><label>Accent Dark</label><input type="color" id="colorAccentDark" value="#0D8A8F"></div>
+          <div><label>Logo Badge BG</label><input type="color" id="colorLogoBg" value="#1AAFB4"></div>
+        </div>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Company</div>
+        <label>Company Name</label><input type="text" id="companyName" value="LV Sewer Inspections">
+        <label>Tagline</label><input type="text" id="companyTagline" value="See What's Beneath the Surface.">
+        <label>Logo URL (blank = initials badge)</label><input type="url" id="companyLogoUrl" placeholder="https://...">
+        <label>Phone</label><input type="tel" id="companyPhone" value="(702) 277-2566">
+        <label>Website</label><input type="text" id="companyWebsite" value="www.LVSewerInspections.com">
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Inspector</div>
+        <label>Inspector Name</label><input type="text" id="inspectorName" value="Marcus R. Delgado">
+        <label>License / Credential</label><input type="text" id="inspectorLicense" value="License #NV-SI-20891">
+      </div>
+
+    </div>
+
+    <!-- ── PANEL: REPORT META + CLIENT ── -->
+    <div class="tab-panel" id="panel-report">
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Report Meta</div>
+        <label>Report Number</label><input type="text" id="reportNumber" value="LV-2026-0517">
+        <label>File Number</label><input type="text" id="fileNumber" value="FILE-2026-0517">
+        <label>Inspection Date</label><input type="text" id="inspectionDate" value="May 17, 2026">
+        <label>Inspection Time</label><input type="text" id="inspectionTime" value="2:30 PM">
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Client &amp; Property</div>
+        <label>Client Name</label><input type="text" id="clientName" value="Jennifer &amp; Thomas Harlow">
+        <label>Street Address</label><input type="text" id="propertyAddress" value="123 Main St">
+        <label>City / State / ZIP</label><input type="text" id="propertyCity" value="Las Vegas, NV 89991">
+        <label>Property Photo URL (blank = placeholder)</label><input type="url" id="propertyPhotoUrl" placeholder="https://...">
+        <label>Property Photo Label</label><input type="text" id="propertyPhotoLabel" value="Front Elevation">
+        <label>Buyer's Agent</label><input type="text" id="buyersAgent" value="Sarah K. Nguyen, Premier Realty">
+        <label>Building Occupied</label><input type="text" id="buildingOccupied" value="Yes">
+        <label>Weather / Soil Conditions</label><input type="text" id="weatherConditions" value="Clear / Dry Soil">
+        <label>People Present</label><input type="text" id="peoplePresent" value="Client, Home Inspector, Buyer's Agent">
+      </div>
+
+    </div>
+
+    <!-- ── PANEL: SEWER SYSTEM ── -->
+    <div class="tab-panel" id="panel-sewer">
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Sewer System</div>
+        <label>Cleanout Location (full sentence or short description)</label>
+        <input type="text" id="cleanoutLocation" value="Rear of the home">
+        <label>Cleanout Size</label>
+        <input type="text" id="cleanoutSize" value='3" ABS'>
+        <label>Pipe Materials (comma-separated)</label>
+        <input type="text" id="pipeTypesRaw" value="ABS, Cast Iron">
+        <label>Total Sewer Length (ft)</label>
+        <input type="text" id="sewerLength" value="87">
+        <label>Camera Direction(s) (one per line)</label>
+        <textarea id="cameraDirections">Main Line: Downstream from cleanout
+Branch: Kitchen lateral</textarea>
+        <label>System Notes</label>
+        <textarea id="systemNotes"></textarea>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Video Links</div>
+        <div id="video-links-list"></div>
+        <button class="btn-add" id="btn-add-video">+ Add Video Link</button>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Camera Log (Observations)</div>
+        <div style="font-size:7pt;color:#5A7A8A;margin-bottom:8px;">Each observation becomes a row in the Sewer Pipe Conditions table. Include "No Defect" observations — they show thoroughness.</div>
+        <div id="obs-list"></div>
+        <button class="btn-add" id="btn-add-obs">+ Add Observation</button>
+      </div>
+
+    </div>
+
+    <!-- ── PANEL: DEFECTS ── -->
+    <div class="tab-panel" id="panel-defects">
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Defect Findings <span style="color:#5A7A8A;font-weight:400;">(each gets its own full page)</span></div>
+        <div id="defect-list"></div>
+        <button class="btn-add" id="btn-add-defect">+ Add Defect</button>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Recommendations</div>
+        <div id="rec-list"></div>
+        <button class="btn-add" id="btn-add-rec">+ Add Recommendation</button>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Additional Notes</div>
+        <textarea id="additionalNotes" placeholder="Any additional notes for the client..."></textarea>
+      </div>
+
+    </div>
+
+    <!-- ── PANEL: APPENDIX / LEGAL ── -->
+    <div class="tab-panel" id="panel-appendix">
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Page Toggles</div>
+        <div class="checkbox-row"><input type="checkbox" id="showMaterialsPage" checked><label for="showMaterialsPage">Include Pipe Materials Reference Page</label></div>
+        <div class="checkbox-row"><input type="checkbox" id="showInspectorBio" checked><label for="showInspectorBio">Include Inspector Bio Page</label></div>
+        <div class="checkbox-row"><input type="checkbox" id="showDefectsGraphic"><label for="showDefectsGraphic">Include Sewer Defects Graphic Page</label></div>
+        <div id="graphic-url-wrap" style="display:none;margin-top:6px;">
+          <label>Defects Graphic Image URL</label>
+          <input type="url" id="defectsGraphicUrl" placeholder="https://...">
+        </div>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Footer Legal Line</div>
+        <textarea id="footerLegal">Prepared exclusively for the named client. Not to be used for the purpose of substitute disclosure.</textarea>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Disclosure Text</div>
+        <textarea id="disclosureText" style="min-height:100px;">This report is intended to be used only as a general guide in order to provide our clients with current condition of the home's and/or building's main sewer line. The report expresses the opinion of the inspector, based upon visual impressions of the conditions that existed at the time of the inspection only.
+
+The inspection report should not be construed as a compliance inspection of any governmental or non-governmental codes or regulations. The report is not intended to be a warranty or guarantee of the present or future adequacy or performance of the sewer line.
+
+LVSI certifies that our inspectors have no interest, present or contemplated, in the listed property or its improvement. Additionally, LVSI has no involvement with trade professionals or benefits derived from any sales, repairs, replacements, modifications or improvements from inspected sewer lines.
+
+All repairs should be done by a competent licensed Plumber and any work requiring building permits should be obtained by the authority having jurisdiction (Local Building Department).
+
+It is the client's sole responsibility to read this report in its entirety, not rely upon any verbal comments and to research any and all jurisdictional permits required by the local authorities regarding the property inspected.</textarea>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Scope of Inspection</div>
+        <textarea id="scopeText" style="min-height:80px;">A sewer inspection scan was requested of the main drain line from the structure to the city, private sewer connection, 150 feet or camera limitations (whichever comes first). The sewer line is to be accessed through a cleanout, roof vent (single story only) or other access point(s) to be determined best by the inspector. The camera inspection does not inspect all of the drain lines running under or within the structure. The following is a summative report of the findings.</textarea>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Point of Reference</div>
+        <textarea id="pointOfReference" style="min-height:70px;">Statements made within this inspection report pertaining to left, right, front or rear were referenced by standing in front of and facing the structure from the street. Additionally, analogue clockface references may be utilized to pinpoint conditions found within the pipe; in this case the 12 o'clock position will be the topmost center of the pipe, the 6 o'clock position will be the bottom most center of the pipe and so on.</textarea>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Statement of Service</div>
+        <textarea id="statementOfService" style="min-height:140px;">LV Sewer Inspections was retained for a survey of the listed structure's main sewer line in an effort to identify any areas of suspect blockages, deficiencies or damage and to document the areas for further review and or action by associated trades professional. Further investigations into these areas or destructive testing may reveal additional conditions that were not readily visible at the time of inspection. This report is based on information obtained at the site at the given date and time of the inspection.
+
+This report is for the exclusive use of our client and is not intended for any other purpose. The report is based on the information available to us at the time as described in the report. Should additional information become available at a later date, we reserve the right to determine the impact, if any, the new information may have on our discovery and recommendations and to revise our opinions and conclusions if necessary and warranted.
+
+We recommend all areas we locate in this report showing anomalies should be evaluated further to find out the cause and be repaired. Our recommendations are not intended as criticisms of the structure, but rather as professional opinions regarding conditions that we observed at the time of our inspection.</textarea>
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Severity Definitions</div>
+        <label>No Defect — Definition</label><textarea id="sevNoneDef">No actionable deficiencies were observed. This classification documents baseline attributes and establishes a benchmark for future assessments.</textarea>
+        <label>No Defect — Examples</label><input type="text" id="sevNoneEg" value="Field Examples: Standard joint alignments, unobstructed flow, accessible cleanout.">
+        <label>Minor — Definition</label><textarea id="sevMinorDef">An incidental finding that does not currently restrict flow or compromise structural integrity. Monitor at future inspections.</textarea>
+        <label>Minor — Examples</label><input type="text" id="sevMinorEg" value="Field Examples: Fine hairline root intrusion, light tuberculation, minor surface pitting.">
+        <label>Moderate — Definition</label><textarea id="sevModDef">A functional impairment that hinders optimal performance and creates catch points for debris. Scheduled repair is recommended.</textarea>
+        <label>Moderate — Examples</label><input type="text" id="sevModEg" value="Field Examples: Offset joints, moderate root masses, minor bellies with standing water.">
+        <label>Major — Definition</label><textarea id="sevMajorDef">A severe structural failure posing immediate risk of sewage backup, environmental contamination, or soil erosion. Immediate professional intervention required.</textarea>
+        <label>Major — Examples</label><input type="text" id="sevMajorEg" value="Field Examples: Fractured or collapsed pipe walls, severe root blockages, broken fittings.">
+        <label>Maintenance — Definition</label><textarea id="sevMaintDef">The pipeline is structurally sound but preventative servicing is required to maintain flow mechanics.</textarea>
+        <label>Maintenance — Examples</label><input type="text" id="sevMaintEg" value="Field Examples: Routine hydro-jetting for grease/sludge, chemical root treatment, descaling.">
+      </div>
+
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Inspector Bio</div>
+        <label>Bio Headline Paragraph</label>
+        <textarea id="inspectorBioHeadline" style="min-height:60px;">Heath is the owner and operator of LV Sewer Inspections with training, certification, and degrees from a variety of organizations.</textarea>
+        <label>Certifications (one per line)</label>
+        <textarea id="inspectorCredentials" style="min-height:80px;">InternNACHI certified for Sewer Scopes/Inspections
+OSHA 10-hr, 30-hr, HAZWHOPER 40-hr, OSHA 511, and OSHA 501
+Associate and bachelor's degree in occupational health and safety
+Lean Six SIGMA white, yellow and green belt certified
+Borescope Certified by the U.S Air Force since 2010</textarea>
+        <label>Experience (one per line)</label>
+        <textarea id="inspectorExperience" style="min-height:60px;">Completed Sewer Inspections across three states spanning Alaska, California, and Nevada since 2021
+Owner and sole administrator of Sewer Scope Education and Training that Mentors 1,400+ plumbers and inspectors online</textarea>
+        <label>Ways &amp; Means Paragraph</label>
+        <textarea id="inspectorWaysAndMeans" style="min-height:80px;">The reporting system LV Sewer Inspections utilizes is continually modernized as the industry and technology develops. The reporting system provides a state-of-the-art electronically produced inspection report that assures all inspections are complete, understandable, and includes digital photos along with a YouTube link to view every inspection. LV Sewer Inspections meets the financial responsibility expected in the property inspection profession by being covered by Errors &amp; Omissions insurance and General Liability insurance.</textarea>
+      </div>
+
+    </div>
+  </div><!-- /controls -->
+
+  <div id="bottom-bar">
+    <button id="btn-render">⟳ Render Preview</button>
+    <button id="btn-pdf">⬇ PDF</button>
+  </div>
+  <div id="pdf-status"></div>
+  <div id="error-banner"></div>
+</div><!-- /sidebar -->
+
+<!-- ── Preview pane ── -->
+<div id="preview-pane">
+  <div id="preview-bar">
+    <strong>Live Preview</strong>
+    <span id="page-count"></span>
+    <span class="hint">Render after each change · PDF downloads from server</span>
+  </div>
+  <iframe id="preview-frame"></iframe>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS — must mirror server.js exactly
+// ═══════════════════════════════════════════════════════════════
+
+const PLACEHOLDER_PHOTO = 'https://placehold.co/800x600/1C2B3A/5A6A7A?text=No+Photo';
+
+const SEV = {
+  none:        { severityLabel: 'No Defect',            severitySub: 'Informational',               severityIcon: '🟢', severityCss: 'none'  },
+  minor:       { severityLabel: 'Minor Defect',          severitySub: 'Monitor',                     severityIcon: '🟡', severityCss: 'minor' },
+  moderate:    { severityLabel: 'Moderate Defect',       severitySub: 'Recommended Action',          severityIcon: '🟠', severityCss: 'mod'   },
+  major:       { severityLabel: 'Major Defect',          severitySub: 'Critical / Immediate Action', severityIcon: '🔴', severityCss: 'major' },
+  maintenance: { severityLabel: 'Suggested Maintenance', severitySub: 'Preventative Care',           severityIcon: '🔵', severityCss: 'maint' },
+};
+
+const PIPE_MATERIALS = [
+  { type: 'Standard Dimensional Ratio (SDR)',        life: '50–500 years' },
+  { type: 'Polyvinyl Chloride (PVC)',                life: '50–500 years' },
+  { type: 'Acrylonitrile Butadiene Styrene (ABS)',   life: '50–500 years' },
+  { type: 'Vitrified Clay Pipe / "Terracotta"',      life: '75–100 years' },
+  { type: 'Cast Iron',                               life: '75–100 years' },
+  { type: 'Concrete',                                life: '50–75 years'  },
+  { type: 'Transite / Asbestos Cement',              life: '40–60 years'  },
+  { type: 'Bituminous Fiber / "Orangeburg"',         life: '30–50 years'  },
+  { type: 'Cured in Place Pipe (CIPP)',              life: '40+ years'    },
+  { type: 'High Density Polyethylene (HDR)',         life: '50–500 years' },
+  { type: 'Thin Walled PVC / "Genova"',             life: '40–70 years'  },
+  { type: 'Galvanized Steel',                        life: '40–70 years'  },
+  { type: 'Lead',                                    life: '100+ years'   },
+  { type: 'Copper',                                  life: '50+ years'    },
+  { type: 'Stainless Steel',                         life: '50+ years'    },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// PROCESS DATA — mirrors server.js processData() exactly
+// ═══════════════════════════════════════════════════════════════
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function initials(name) {
+  return (name || '').split(' ').slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+}
+
+function resolvePhotos(photos) {
+  if (!photos || photos.length === 0) return [PLACEHOLDER_PHOTO];
+  return photos.map(url => (url && url.trim()) ? url.trim() : PLACEHOLDER_PHOTO);
+}
+
+function photoGridClass(photos) {
+  if (photos.length === 1) return 'cols-1';
+  if (photos.length === 2) return 'cols-2';
+  return 'cols-3';
+}
+
+function processData(raw) {
+  const defects = (raw.defects || []).map((d, i) => {
+    const sev    = SEV[d.severity] || SEV.minor;
+    const photos = resolvePhotos(d.photos);
+    return { ...d, ...sev, num: pad(i + 1), photos, gridClass: photoGridClass(photos), hasPhotos: true };
+  });
+
+  const observations = (raw.observations || []).map(o => {
+    const sev    = SEV[o.severity] || SEV.none;
+    const photos = resolvePhotos(o.photos);
+    return { ...o, ...sev, photos, gridClass: photoGridClass(photos), hasPhotos: true };
+  });
+
+  let nextPage = 6;
+  const hasObservations = observations.length > 0;
+  let obsPage = null;
+  if (hasObservations) { obsPage = nextPage; nextPage++; }
+
+  const defectStartPage = nextPage;
+  nextPage += defects.length;
+
+  const recPage  = nextPage++;
+  const sosPage  = nextPage++;
+  const materialsPage  = (raw.showMaterialsPage !== false) ? nextPage++ : null;
+  const graphicPage    = (raw.showDefectsGraphic !== false && raw.defectsGraphicUrl) ? nextPage++ : null;
+  const bioPage        = (raw.showInspectorBio !== false) ? nextPage++ : null;
+  const totalPages     = nextPage - 1;
+
+  defects.forEach((d, i) => { d.pageNum = pad(defectStartPage + i); });
+
+  const videoLinks = (raw.videoLinks || []).filter(v => v && v.url);
+
+  const inspectorCredentials = Array.isArray(raw.inspectorCredentials)
+    ? raw.inspectorCredentials
+    : (raw.inspectorCredentials || '').split('\n').filter(Boolean);
+
+  const inspectorExperience = Array.isArray(raw.inspectorExperience)
+    ? raw.inspectorExperience
+    : (raw.inspectorExperience || '').split('\n').filter(Boolean);
+
+  return {
+    ...raw,
+    companyInitials:   initials(raw.companyName),
+    fullAddress:       [raw.propertyAddress, raw.propertyCity].filter(Boolean).join(', '),
+    pipeTypesDisplay:  (raw.pipeTypes || []).join(', '),
+    defectCount:       pad(defects.length),
+    obsCount:          pad(observations.length),
+    lastPage:          pad(totalPages),
+    defects,
+    observations,
+    videoLinks,
+    inspectorCredentials,
+    inspectorExperience,
+    hasDefects:         defects.length > 0,
+    hasObservations,
+    hasVideoLinks:      videoLinks.length > 0,
+    hasRecommendations: (raw.recommendations || []).length > 0,
+    hasAdditionalNotes: !!(raw.additionalNotes && raw.additionalNotes.trim()),
+    showMaterialsPage:  raw.showMaterialsPage !== false,
+    showDefectsGraphic: !!(raw.showDefectsGraphic !== false && raw.defectsGraphicUrl),
+    showInspectorBio:   raw.showInspectorBio !== false,
+    pages: {
+      cover: 1, toc: 2, disclosure: 3, clientInfo: 4, severity: 5,
+      observations: obsPage, defectStart: defectStartPage,
+      recommendations: recPage, statementOfService: sosPage,
+      materials: materialsPage, defectsGraphic: graphicPage, inspectorBio: bioPage,
+      total: totalPages,
+    },
+    pipeMaterials: PIPE_MATERIALS,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DYNAMIC FORM BUILDERS
+// ═══════════════════════════════════════════════════════════════
+
+let defectCount = 0;
+let obsCount    = 0;
+let videoCount  = 0;
+let recCount    = 0;
+
+function addDefect(data = {}) {
+  const id = defectCount++;
+  const el = document.createElement('div');
+  el.className = 'defect-card';
+  el.dataset.defectId = id;
+  el.innerHTML = `
+    <div class="defect-card-hd">
+      <span class="defect-card-title">Defect ${id + 1}</span>
+      <button class="btn-remove" onclick="this.closest('.defect-card').remove(); renumberDefects();">✕ Remove</button>
+    </div>
+    <label>Title</label>
+    <input type="text" class="d-title" value="${data.title || ''}">
+    <label>Severity</label>
+    <select class="d-severity">
+      ${['none','minor','moderate','major','maintenance'].map(s =>
+        `<option value="${s}" ${data.severity===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`
+      ).join('')}
+    </select>
+    <label>Time (mm:ss)</label>
+    <input type="text" class="d-time" value="${data.time || ''}" placeholder="0:42">
+    <label>Distance (ft)</label>
+    <input type="text" class="d-feet" value="${data.feet || ''}">
+    <label>Narrative</label>
+    <textarea class="d-narrative" style="min-height:60px;">${data.narrative || ''}</textarea>
+    <label>Photos (URLs — blank = placeholder)</label>
+    <div class="photo-inputs">
+      ${(data.photos || ['','']).map((url, pi) => `
+        <div class="photo-input-row">
+          <span>${pi+1}</span>
+          <input type="url" class="d-photo" value="${url}" placeholder="https://...">
+        </div>`).join('')}
+    </div>
+    <button class="btn-add-photo" onclick="addPhotoRow(this)">+ Add photo slot</button>
+  `;
+  document.getElementById('defect-list').appendChild(el);
+}
+
+function addPhotoRow(btn) {
+  const wrap = btn.previousElementSibling;
+  const count = wrap.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'photo-input-row';
+  row.innerHTML = `<span>${count}</span><input type="url" class="d-photo" placeholder="https://...">`;
+  wrap.appendChild(row);
+}
+
+function renumberDefects() {
+  document.querySelectorAll('.defect-card .defect-card-title').forEach((el, i) => {
+    el.textContent = `Defect ${i + 1}`;
+  });
+}
+
+function addObservation(data = {}) {
+  const id = obsCount++;
+  const el = document.createElement('div');
+  el.className = 'obs-card';
+  el.innerHTML = `
+    <div class="obs-card-hd">
+      <span class="obs-card-title">Observation ${id + 1}</span>
+      <button class="btn-remove" onclick="this.closest('.obs-card').remove()">✕</button>
+    </div>
+    <label>Time</label><input type="text" class="o-time" value="${data.time || ''}" placeholder="01:44">
+    <label>Distance (ft)</label><input type="text" class="o-feet" value="${data.feet || ''}">
+    <label>Severity</label>
+    <select class="o-severity">
+      ${['none','minor','moderate','major','maintenance'].map(s =>
+        `<option value="${s}" ${data.severity===s?'selected':''}>` +
+        (s==='none'?'No Defect':s.charAt(0).toUpperCase()+s.slice(1))+`</option>`
+      ).join('')}
+    </select>
+    <label>Observation Note</label>
+    <textarea class="o-note">${data.note || ''}</textarea>
+    <label>Photo URL (optional)</label>
+    <input type="url" class="o-photo" value="${(data.photos && data.photos[0]) || ''}" placeholder="https://...">
+  `;
+  document.getElementById('obs-list').appendChild(el);
+}
+
+function addVideoLink(data = {}) {
+  const el = document.createElement('div');
+  el.className = 'rec-row';
+  el.innerHTML = `
+    <div style="flex:1">
+      <input type="text" class="v-label" value="${data.label || ''}" placeholder="Main Line Full Run" style="margin-bottom:3px;">
+      <input type="url"  class="v-url"   value="${data.url   || ''}" placeholder="https://youtu.be/...">
+    </div>
+    <button class="btn-rm-rec" onclick="this.closest('.rec-row').remove()">✕</button>
+  `;
+  document.getElementById('video-links-list').appendChild(el);
+}
+
+function addRec(text = '') {
+  const el = document.createElement('div');
+  el.className = 'rec-row';
+  el.innerHTML = `
+    <textarea class="rec-text">${text}</textarea>
+    <button class="btn-rm-rec" onclick="this.closest('.rec-row').remove()">✕</button>
+  `;
+  document.getElementById('rec-list').appendChild(el);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COLLECT FORM DATA → raw payload
+// ═══════════════════════════════════════════════════════════════
+
+function collectFormData() {
+  const v = id => document.getElementById(id)?.value || '';
+  const checked = id => document.getElementById(id)?.checked;
+
+  const defects = [...document.querySelectorAll('.defect-card')].map(card => ({
+    title:     card.querySelector('.d-title').value,
+    severity:  card.querySelector('.d-severity').value,
+    time:      card.querySelector('.d-time').value,
+    feet:      card.querySelector('.d-feet').value,
+    narrative: card.querySelector('.d-narrative').value,
+    photos:    [...card.querySelectorAll('.d-photo')].map(i => i.value),
+  }));
+
+  const observations = [...document.querySelectorAll('.obs-card')].map(card => ({
+    time:     card.querySelector('.o-time').value,
+    feet:     card.querySelector('.o-feet').value,
+    severity: card.querySelector('.o-severity').value,
+    note:     card.querySelector('.o-note').value,
+    photos:   [card.querySelector('.o-photo').value].filter(Boolean),
+  }));
+
+  const videoLinks = [...document.querySelectorAll('#video-links-list .rec-row')].map(row => ({
+    label: row.querySelector('.v-label').value,
+    url:   row.querySelector('.v-url').value,
+  })).filter(v => v.url);
+
+  const recommendations = [...document.querySelectorAll('.rec-text')].map(t => t.value).filter(Boolean);
+
+  const showDefectsGraphic = checked('showDefectsGraphic');
+
+  return {
+    // theme
+    colorHeaderBg:   v('colorHeaderBg'),
+    colorHeaderText: v('colorHeaderText'),
+    colorAccent:     v('colorAccent'),
+    colorAccentDark: v('colorAccentDark'),
+    colorLogoBg:     v('colorLogoBg'),
+    // company
+    companyName:     v('companyName'),
+    companyTagline:  v('companyTagline'),
+    companyLogoUrl:  v('companyLogoUrl'),
+    companyPhone:    v('companyPhone'),
+    companyWebsite:  v('companyWebsite'),
+    // inspector
+    inspectorName:    v('inspectorName'),
+    inspectorLicense: v('inspectorLicense'),
+    inspectorBioHeadline:  v('inspectorBioHeadline'),
+    inspectorCredentials:  v('inspectorCredentials'),
+    inspectorExperience:   v('inspectorExperience'),
+    inspectorWaysAndMeans: v('inspectorWaysAndMeans'),
+    // report meta
+    reportNumber:   v('reportNumber'),
+    fileNumber:     v('fileNumber'),
+    inspectionDate: v('inspectionDate'),
+    inspectionTime: v('inspectionTime'),
+    // client
+    clientName:         v('clientName'),
+    propertyAddress:    v('propertyAddress'),
+    propertyCity:       v('propertyCity'),
+    propertyPhotoUrl:   v('propertyPhotoUrl'),
+    propertyPhotoLabel: v('propertyPhotoLabel'),
+    buyersAgent:        v('buyersAgent'),
+    buildingOccupied:   v('buildingOccupied'),
+    weatherConditions:  v('weatherConditions'),
+    peoplePresent:      v('peoplePresent'),
+    // sewer
+    cleanoutLocation:  v('cleanoutLocation'),
+    cleanoutSize:      v('cleanoutSize'),
+    pipeTypes:         v('pipeTypesRaw').split(',').map(s => s.trim()).filter(Boolean),
+    sewerLength:       v('sewerLength'),
+    cameraDirections:  v('cameraDirections'),
+    systemNotes:       v('systemNotes'),
+    videoLinks,
+    // arrays
+    observations,
+    defects,
+    recommendations,
+    additionalNotes: v('additionalNotes'),
+    // toggles
+    showMaterialsPage:   checked('showMaterialsPage'),
+    showInspectorBio:    checked('showInspectorBio'),
+    showDefectsGraphic,
+    defectsGraphicUrl:   showDefectsGraphic ? v('defectsGraphicUrl') : '',
+    // legal/boilerplate
+    footerLegal:         v('footerLegal'),
+    disclosureText:      v('disclosureText'),
+    scopeText:           v('scopeText'),
+    pointOfReference:    v('pointOfReference'),
+    statementOfService:  v('statementOfService'),
+    // severity
+    sevNoneDef:  v('sevNoneDef'),  sevNoneEg:  v('sevNoneEg'),
+    sevMinorDef: v('sevMinorDef'), sevMinorEg: v('sevMinorEg'),
+    sevModDef:   v('sevModDef'),   sevModEg:   v('sevModEg'),
+    sevMajorDef: v('sevMajorDef'), sevMajorEg: v('sevMajorEg'),
+    sevMaintDef: v('sevMaintDef'), sevMaintEg: v('sevMaintEg'),
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER PREVIEW
+// ═══════════════════════════════════════════════════════════════
+
+let templateText = null;
+
+async function loadTemplate() {
+  if (templateText) return templateText;
+  const res = await fetch('report.ejs');
+  if (!res.ok) throw new Error(`Could not load report.ejs — is the server running? (${res.status})`);
+  templateText = await res.text();
+  return templateText;
+}
+
+async function renderPreview() {
+  const btn = document.getElementById('btn-render');
+  const errBanner = document.getElementById('error-banner');
+  btn.textContent = '⟳ Rendering…';
+  btn.disabled = true;
+  errBanner.style.display = 'none';
+
+  try {
+    const raw  = collectFormData();
+    const data = processData(raw);
+
+    // Inject theme CSS for browser render
+    data.__themeCSS = `
+      --color-header-bg:   ${data.colorHeaderBg   || '#0D2137'};
+      --color-header-text: ${data.colorHeaderText || '#FFFFFF'};
+      --color-accent:      ${data.colorAccent      || '#1AAFB4'};
+      --color-accent-dark: ${data.colorAccentDark  || '#0D8A8F'};
+      --color-logo-bg:     ${data.colorLogoBg      || '#1AAFB4'};
+    `;
+
+    const tmpl = await loadTemplate();
+    const html = ejs.render(tmpl, data, { rmWhitespace: false });
+
+    const frame = document.getElementById('preview-frame');
+    frame.srcdoc = html;
+
+    // Update page count after frame loads
+    frame.onload = () => {
+      const pageCount = frame.contentDocument?.querySelectorAll('.page').length || 0;
+      document.getElementById('page-count').textContent = `${pageCount} page${pageCount !== 1 ? 's' : ''}`;
+    };
+  } catch (err) {
+    errBanner.style.display = 'block';
+    errBanner.textContent = '⚠ Render error: ' + err.message;
+    console.error(err);
+  } finally {
+    btn.textContent = '⟳ Render Preview';
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF DOWNLOAD
+// ═══════════════════════════════════════════════════════════════
+
+async function downloadPDF() {
+  const btn    = document.getElementById('btn-pdf');
+  const status = document.getElementById('pdf-status');
+  btn.disabled = true;
+  btn.textContent = '…';
+  status.textContent = 'Generating PDF on server…';
+
+  try {
+    const raw = collectFormData();
+    const res = await fetch('/api/generate-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(raw),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || res.statusText);
+    }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `report-${document.getElementById('reportNumber').value || 'draft'}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    status.textContent = '✓ PDF downloaded.';
+  } catch (err) {
+    status.textContent = '⚠ PDF error: ' + err.message;
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⬇ PDF';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.panel).classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// WIRE UP BUTTONS & TOGGLES
+// ═══════════════════════════════════════════════════════════════
+
+document.getElementById('btn-render').addEventListener('click', renderPreview);
+document.getElementById('btn-pdf').addEventListener('click', downloadPDF);
+
+document.getElementById('btn-add-defect').addEventListener('click', () => addDefect());
+document.getElementById('btn-add-obs').addEventListener('click', () => addObservation());
+document.getElementById('btn-add-video').addEventListener('click', () => addVideoLink());
+document.getElementById('btn-add-rec').addEventListener('click', () => addRec());
+
+document.getElementById('showDefectsGraphic').addEventListener('change', function() {
+  document.getElementById('graphic-url-wrap').style.display = this.checked ? 'block' : 'none';
+});
+
+// ═══════════════════════════════════════════════════════════════
+// SEED DEFAULT DATA
+// ═══════════════════════════════════════════════════════════════
+
+addDefect({
+  title: 'Root Intrusion — Fine Hairline', severity: 'minor',
+  time: '0:42', feet: '12',
+  narrative: 'At approximately 0 min: 42 sec / 12 ft, fine hairline root intrusion was observed entering through the bell joint. The intrusion does not currently restrict hydraulic flow.',
+  photos: ['', '', ''],
+});
+addDefect({
+  title: 'Offset Joint — Physical Lip', severity: 'moderate',
+  time: '2:15', feet: '38',
+  narrative: 'At approximately 2 min: 15 sec / 38 ft, a measurable offset joint was identified creating a physical lip on the invert. Scheduled repair is recommended.',
+  photos: ['', ''],
+});
+addDefect({
+  title: 'Fractured Pipe Wall — Structural Failure', severity: 'major',
+  time: '3:58', feet: '61',
+  narrative: 'At approximately 3 min: 58 sec / 61 ft, a circumferential fracture spanning 270° was observed. Structural integrity is critically compromised. Immediate intervention required.',
+  photos: ['', '', ''],
+});
+
+addVideoLink({ label: 'Main Line Full Run', url: 'https://youtu.be/EXAMPLE' });
+
+addRec('Immediate excavation and pipe replacement required at the 61 ft fracture within 48 hours.');
+addRec('Schedule professional hydro-jetting within 30–60 days to clear FOG buildup.');
+addRec('Re-inspect root intrusion at 12 ft in 12 months.');
+
+// Auto-render on load
+window.addEventListener('load', () => {
+  setTimeout(renderPreview, 300);
+});
+</script>
+</body>
+</html>

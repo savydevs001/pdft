@@ -1,0 +1,4 @@
+//add the standard gitignore for npde js project with express, including .env node modules etc
+# Node.js
+node_modules/
+

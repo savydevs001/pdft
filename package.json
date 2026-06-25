@@ -1,0 +1,20 @@
+{
+  "name": "pdft",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "fs": "^0.0.1-security",
+    "handlebars": "^4.7.9",
+    "puppeteer": "^25.2.0"
+  }
+}

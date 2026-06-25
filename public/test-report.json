@@ -1,0 +1,163 @@
+{
+    "colorHeaderBg": "#0d2137",
+    "colorHeaderText": "#ffffff",
+    "colorAccent": "#1aafb4",
+    "colorAccentDark": "#0d8a8f",
+    "colorLogoBg": "#1aafb4",
+    "companyName": "LV Sewer Inspections",
+    "companyTagline": "See What's Beneath the Surface.",
+    "companyLogoUrl": "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+    "companyPhone": "(702) 277-2566",
+    "companyWebsite": "www.LVSewerInspections.com",
+    "inspectorName": "Marcus R. Delgado",
+    "inspectorLicense": "License #NV-SI-20891",
+    "inspectorBioHeadline": "Heath is the owner and operator of LV Sewer Inspections with training, certification, and degrees from a variety of organizations.",
+    "inspectorCredentials": "InternNACHI certified for Sewer Scopes/Inspections\nOSHA 10-hr, 30-hr, HAZWHOPER 40-hr, OSHA 511, and OSHA 501\nAssociate and bachelor's degree in occupational health and safety\nLean Six SIGMA white, yellow and green belt certified\nBorescope Certified by the U.S Air Force since 2010",
+    "inspectorExperience": "Completed Sewer Inspections across three states spanning Alaska, California, and Nevada since 2021\nOwner and sole administrator of Sewer Scope Education and Training that Mentors 1,400+ plumbers and inspectors online",
+    "inspectorWaysAndMeans": "The reporting system LV Sewer Inspections utilizes is continually modernized as the industry and technology develops. The reporting system provides a state-of-the-art electronically produced inspection report that assures all inspections are complete, understandable, and includes digital photos along with a YouTube link to view every inspection. LV Sewer Inspections meets the financial responsibility expected in the property inspection profession by being covered by Errors & Omissions insurance and General Liability insurance.",
+    "reportNumber": "LV-2026-0517",
+    "fileNumber": "FILE-2026-0517",
+    "inspectionDate": "May 17, 2026",
+    "inspectionTime": "2:30 PM",
+    "clientName": "Jennifer & Thomas Harlow",
+    "propertyAddress": "123 Main St",
+    "propertyCity": "Las Vegas, NV 89991",
+    "propertyPhotoUrl": "",
+    "propertyPhotoLabel": "Front Elevation",
+    "buyersAgent": "Sarah K. Nguyen, Premier Realty",
+    "buildingOccupied": "Yes",
+    "weatherConditions": "Clear / Dry Soil",
+    "peoplePresent": "Client, Home Inspector, Buyer's Agent",
+    "cleanoutLocation": "Rear of the home",
+    "cleanoutSize": "3\" ABS",
+    "pipeTypes": [
+        "ABS",
+        "Cast Iron"
+    ],
+    "sewerLength": "87",
+    "cameraDirections": "Main Line: Downstream from cleanout\nBranch: Kitchen lateral",
+    "systemNotes": "",
+    "videoLinks": [
+        {
+            "label": "Main Line Full Run",
+            "url": "https://youtu.be/EXAMPLE"
+        }
+    ],
+    "observations": [
+        {
+            "time": "",
+            "feet": "23",
+            "severity": "minor",
+            "note": "this is the observation note for the observation",
+            "photos": [
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg"
+            ]
+        },
+        {
+            "time": "",
+            "feet": "45",
+            "severity": "moderate",
+            "note": "this is the observation note for the observation",
+            "photos": [
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg"
+            ]
+        },
+        {
+            "time": "",
+            "feet": "67",
+            "severity": "major",
+            "note": "this is the observation note for the observation",
+            "photos": [
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg"
+            ]
+        },
+        {
+            "time": "",
+            "feet": "89",
+            "severity": "minor",
+            "note": "this is the observation note for the observation",
+            "photos": [
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg"
+            ]
+        },
+        {
+            "time": "",
+            "feet": "111",
+            "severity": "moderate",
+            "note": "this is the observation note for the observation",
+            "photos": [
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+                "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg"
+            ]
+        }
+    ],
+    "defects": [
+        {
+            "title": "Root Intrusion — Fine Hairline",
+            "severity": "minor",
+            "time": "0:42",
+            "feet": "12",
+            "narrative": "At approximately 0 min: 42 sec / 12 ft, fine hairline root intrusion was observed entering through the bell joint. The intrusion does not currently restrict hydraulic flow.",
+            "photos": [
+                "",
+                "",
+                ""
+            ]
+        },
+        {
+            "title": "Offset Joint — Physical Lip",
+            "severity": "moderate",
+            "time": "2:15",
+            "feet": "38",
+            "narrative": "At approximately 2 min: 15 sec / 38 ft, a measurable offset joint was identified creating a physical lip on the invert. Scheduled repair is recommended.",
+            "photos": [
+                "",
+                ""
+            ]
+        },
+        {
+            "title": "Fractured Pipe Wall — Structural Failure",
+            "severity": "major",
+            "time": "3:58",
+            "feet": "61",
+            "narrative": "At approximately 3 min: 58 sec / 61 ft, a circumferential fracture spanning 270° was observed. Structural integrity is critically compromised. Immediate intervention required.",
+            "photos": [
+                "",
+                "",
+                ""
+            ]
+        }
+    ],
+    "recommendations": [
+        "Immediate excavation and pipe replacement required at the 61 ft fracture within 48 hours.",
+        "Schedule professional hydro-jetting within 30–60 days to clear FOG buildup.",
+        "Re-inspect root intrusion at 12 ft in 12 months."
+    ],
+    "additionalNotes": "",
+    "showMaterialsPage": true,
+    "showInspectorBio": true,
+    "showDefectsGraphic": false,
+    "defectsGraphicUrl": "",
+    "footerLegal": "Prepared exclusively for the named client. Not to be used for the purpose of substitute disclosure.",
+    "disclosureText": "This report is intended to be used only as a general guide in order to provide our clients with current condition of the home's and/or building's main sewer line. The report expresses the opinion of the inspector, based upon visual impressions of the conditions that existed at the time of the inspection only.\n\nThe inspection report should not be construed as a compliance inspection of any governmental or non-governmental codes or regulations. The report is not intended to be a warranty or guarantee of the present or future adequacy or performance of the sewer line.\n\nLVSI certifies that our inspectors have no interest, present or contemplated, in the listed property or its improvement. Additionally, LVSI has no involvement with trade professionals or benefits derived from any sales, repairs, replacements, modifications or improvements from inspected sewer lines.\n\nAll repairs should be done by a competent licensed Plumber and any work requiring building permits should be obtained by the authority having jurisdiction (Local Building Department).\n\nIt is the client's sole responsibility to read this report in its entirety, not rely upon any verbal comments and to research any and all jurisdictional permits required by the local authorities regarding the property inspected.",
+    "scopeText": "A sewer inspection scan was requested of the main drain line from the structure to the city, private sewer connection, 150 feet or camera limitations (whichever comes first). The sewer line is to be accessed through a cleanout, roof vent (single story only) or other access point(s) to be determined best by the inspector. The camera inspection does not inspect all of the drain lines running under or within the structure. The following is a summative report of the findings.",
+    "pointOfReference": "Statements made within this inspection report pertaining to left, right, front or rear were referenced by standing in front of and facing the structure from the street. Additionally, analogue clockface references may be utilized to pinpoint conditions found within the pipe; in this case the 12 o'clock position will be the topmost center of the pipe, the 6 o'clock position will be the bottom most center of the pipe and so on.",
+    "statementOfService": "LV Sewer Inspections was retained for a survey of the listed structure's main sewer line in an effort to identify any areas of suspect blockages, deficiencies or damage and to document the areas for further review and or action by associated trades professional. Further investigations into these areas or destructive testing may reveal additional conditions that were not readily visible at the time of inspection. This report is based on information obtained at the site at the given date and time of the inspection.\n\nThis report is for the exclusive use of our client and is not intended for any other purpose. The report is based on the information available to us at the time as described in the report. Should additional information become available at a later date, we reserve the right to determine the impact, if any, the new information may have on our discovery and recommendations and to revise our opinions and conclusions if necessary and warranted.\n\nWe recommend all areas we locate in this report showing anomalies should be evaluated further to find out the cause and be repaired. Our recommendations are not intended as criticisms of the structure, but rather as professional opinions regarding conditions that we observed at the time of our inspection.",
+    "sevNoneDef": "No actionable deficiencies were observed. This classification documents baseline attributes and establishes a benchmark for future assessments.",
+    "sevNoneEg": "Field Examples: Standard joint alignments, unobstructed flow, accessible cleanout.",
+    "sevMinorDef": "An incidental finding that does not currently restrict flow or compromise structural integrity. Monitor at future inspections.",
+    "sevMinorEg": "Field Examples: Fine hairline root intrusion, light tuberculation, minor surface pitting.",
+    "sevModDef": "A functional impairment that hinders optimal performance and creates catch points for debris. Scheduled repair is recommended.",
+    "sevModEg": "Field Examples: Offset joints, moderate root masses, minor bellies with standing water.",
+    "sevMajorDef": "A severe structural failure posing immediate risk of sewage backup, environmental contamination, or soil erosion. Immediate professional intervention required.",
+    "sevMajorEg": "Field Examples: Fractured or collapsed pipe walls, severe root blockages, broken fittings.",
+    "sevMaintDef": "The pipeline is structurally sound but preventative servicing is required to maintain flow mechanics.",
+    "sevMaintEg": "Field Examples: Routine hydro-jetting for grease/sludge, chemical root treatment, descaling."
+}
