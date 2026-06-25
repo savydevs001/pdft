@@ -102,19 +102,18 @@ body {
 .sh h2  { font-size: 12.5pt; font-weight: 800; color: var(--color-body-text); flex: 1; }
 .sh-num { font-size: 7pt; font-weight: 700; color: var(--color-accent); letter-spacing: .10em; text-transform: uppercase; }
 
-/* ══ SHARED FOOTER ═══════════════════════════════════════════════ */
+/* ══ SHARED FOOTER (all pages) ═══════════════════════════════════ */
 .pf {
-  background: var(--color-header-bg);
-  color: var(--color-header-text);
-  padding: 7px var(--ph);
-  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  padding: 7px var(--ph) 8px;
   flex-shrink: 0;
-  border-top: 3px solid var(--color-accent);
+  background: var(--color-page-bg);
 }
-.pf-co  { font-size: 7pt; font-weight: 700; opacity: .85; }
-.pf-leg { font-size: 6pt; opacity: .50; text-align: center; flex: 1; padding: 0 12px; }
-.pf-pg  { font-size: 7pt; letter-spacing: .06em; opacity: .72; }
-.pf-pg strong { color: #fff; font-size: 8.5pt; }
+.pf-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 3px; }
+.pf-co  { font-size: 7.5pt; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--color-body-text); }
+.pf-pg  { font-size: 7pt; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
+.pf-pg strong { color: var(--color-body-text); }
+.pf-leg { font-size: 6pt; color: var(--color-muted); line-height: 1.5; }
 
 /* ══ INFO TABLE ══════════════════════════════════════════════════ */
 .info-tbl { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
@@ -315,74 +314,132 @@ body {
 .bio-footer .biz-contact { font-size: 11pt; font-weight: 700; color: var(--color-accent); }
 .bio-footer .biz-web { font-size: 9pt; color: var(--color-muted); text-decoration: underline; }
 
+
 /* ══ COVER PAGE ══════════════════════════════════════════════════ */
-.cover-header {
+
+/* Dedicated cover header — bigger than shared .ph */
+.cover-ph {
   background: var(--color-header-bg);
   color: var(--color-header-text);
-  padding: 22px var(--ph) 18px;
-  display: flex; align-items: center; gap: 14px;
+  padding: 18px var(--ph);
+  display: flex; align-items: center; justify-content: space-between;
   flex-shrink: 0;
 }
-.cover-logo-badge {
-  width: 52px; height: 52px; border-radius: 10px;
+.cover-ph-logo { display: flex; align-items: center; gap: 14px; }
+.cover-ph-badge {
+  width: 56px; height: 56px; border-radius: 10px;
   background: var(--color-logo-bg);
   display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 18px; color: #fff;
+  font-weight: 900; font-size: 20px; color: #fff;
   letter-spacing: -.5px; flex-shrink: 0; overflow: hidden;
 }
-.cover-logo-badge img { width: 100%; height: 100%; object-fit: cover; }
-.cover-logo-divider { width: 1px; height: 42px; background: rgba(255,255,255,.22); }
-.cover-name h1 { font-size: 18pt; font-weight: 900; letter-spacing: -.01em; }
-.cover-name p  { font-size: 9pt; opacity: .68; margin-top: 2px; }
-.cover-accent  { height: 4px; background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark)); flex-shrink: 0; }
+.cover-ph-badge img { width: 100%; height: 100%; object-fit: cover; }
+.cover-ph-divider { width: 1px; height: 44px; background: rgba(255,255,255,.22); }
+.cover-ph-name h1 { font-size: 17pt; font-weight: 900; letter-spacing: .01em; }
+.cover-ph-name p  { font-size: 9pt; opacity: .70; margin-top: 2px; }
+.cover-ph-meta { text-align: right; }
+.cover-ph-meta-row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 2px; }
+.cover-ph-lbl { font-size: 7pt; opacity: .60; letter-spacing: .08em; text-transform: uppercase; }
+.cover-ph-val { font-size: 10pt; font-weight: 800; }
 
-.cover-photo-wrap {
-  flex: 1; overflow: hidden; position: relative;
-  background: var(--color-row-alt);
-  display: flex; align-items: center; justify-content: center;
+/* Photo card — tall, inset, rounded with shadow */
+.cover-photo-card {
+  margin: 12px 16px 0;
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid #D8E4EE;
+  box-shadow: 0 4px 20px rgba(0,0,0,.16);
+  position: relative; flex-shrink: 0;
+  height: 5.1in;
+  background: #1C2B3A;
 }
-.cover-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.cover-photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cover-photo-label {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(13,33,55,.58); color: #fff;
-  text-align: center; font-size: 8pt; font-weight: 700;
-  letter-spacing: .08em; text-transform: uppercase;
-  padding: 6px 0;
+  position: absolute; bottom: 12px; left: 12px;
+  background: rgba(13,33,55,.82); color: #fff;
+  font-size: 6.5pt; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 12px; border-radius: 5px;
 }
-.cover-meta {
-  background: var(--color-header-bg);
-  color: var(--color-header-text);
-  padding: 16px var(--ph);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 20px;
-  flex-shrink: 0;
+
+/* Timeline — pure CSS, no SVG, no gradients
+   Thin horizontal line with evenly-spaced tick marks via border-image trick */
+.cover-timeline {
+  display: flex; align-items: center;
+  padding: 10px var(--ph) 0;
+  gap: 6px; flex-shrink: 0;
 }
-.cover-meta-item { display: flex; flex-direction: column; gap: 1px; }
-.cover-meta-lbl  { font-size: 6.5pt; opacity: .55; letter-spacing: .10em; text-transform: uppercase; }
-.cover-meta-val  { font-size: 9.5pt; font-weight: 700; }
-.cover-address-block {
-  text-align: center; padding: 10px var(--ph);
-  border-bottom: 1px solid var(--color-border);
-  flex-shrink: 0;
+.cover-tl-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--color-accent); flex-shrink: 0;
 }
-.cover-address-block .address-main { font-size: 13pt; font-weight: 800; }
-.cover-address-block .address-city { font-size: 9.5pt; color: var(--color-muted); }
-.cover-contact {
-  text-align: center; padding: 10px;
-  flex-shrink: 0;
-  background: var(--color-row-alt);
+.cover-tl-line {
+  flex: 1; height: 10px; flex-shrink: 1;
+  position: relative;
+}
+/* Base horizontal line */
+.cover-tl-line::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 4px;
+  height: 1.5px;
+  background: var(--color-accent);
+  opacity: .35;
+}
+/* Tick marks: repeating-linear-gradient paints short vertical slices */
+.cover-tl-line::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 10px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-accent) 0px,
+    var(--color-accent) 1.5px,
+    transparent 1.5px,
+    transparent 18px
+  );
+}
+.cover-tl-arrow { color: var(--color-accent); font-size: 9pt; flex-shrink: 0; line-height: 1; }
+
+/* Address block */
+.cover-address { padding: 7px var(--ph) 0; flex-shrink: 0; }
+.cover-eyebrow {
+  font-size: 7.5pt; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--color-accent); margin-bottom: 3px;
+}
+.cover-street {
+  font-size: 34pt; font-weight: 900; line-height: 1;
+  color: var(--color-body-text); letter-spacing: -.02em;
+}
+.cover-city {
+  font-size: 18pt; font-weight: 600; line-height: 1.2;
+  color: var(--color-muted); margin-top: 4px;
+}
+
+/* Meta strip */
+.cover-meta-strip {
+  padding: 7px var(--ph) 0;
+  font-size: 8pt; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.cover-meta-strip .dot { color: var(--color-accent); font-size: 9pt; line-height: 1; }
+
+/* Cover footer */
+.cover-footer {
+  margin-top: auto;
   border-top: 1px solid var(--color-border);
+  padding: 7px var(--ph) 8px; flex-shrink: 0;
 }
-.cover-contact .tagline     { font-size: 9pt; font-style: italic; color: var(--color-muted); }
-.cover-contact .phone       { font-size: 13pt; font-weight: 800; color: var(--color-body-text); margin: 3px 0; }
-.cover-contact .website     { font-size: 8.5pt; color: var(--color-accent); }
-.cover-legal {
-  padding: 8px var(--ph);
-  font-size: 6.5pt; color: var(--color-muted);
-  text-align: center; line-height: 1.5;
-  flex-shrink: 0;
+.cover-footer .cf-top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 4px;
 }
+.cf-co    { font-size: 7.5pt; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--color-body-text); }
+.cf-pg    { font-size: 7pt; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
+.cf-pg strong { color: var(--color-body-text); }
+.cf-legal { font-size: 6pt; color: var(--color-muted); line-height: 1.6; }
+.cf-legal strong { font-weight: 700; color: var(--color-body-text); }
+.cf-copy  { font-size: 6pt; color: var(--color-muted); margin-top: 2px; }
 
 /* ══ PROPERTY PHOTO ON CLIENT PAGE ════════════════════════════════ */
 .client-layout { display: grid; grid-template-columns: 1fr 200px; gap: 16px; align-items: start; }
@@ -397,43 +454,62 @@ body {
 <!-- ════════════════════════════════════════════════════════
      PAGE 1 — COVER
 ════════════════════════════════════════════════════════ -->
-<div class="page">
-  <div class="cover-header">
-    <div class="cover-logo-badge">
-      <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %>
+<div class="page page-cover">
+  <%# Dedicated BIGGER cover header — NOT .ph so it doesn't inherit small sizing %>
+  <header class="cover-ph">
+    <div class="cover-ph-logo">
+      <div class="cover-ph-badge">
+        <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %>
+      </div>
+      <div class="cover-ph-divider"></div>
+      <div class="cover-ph-name">
+        <h1><%= companyName %></h1>
+        <p><%= companyTagline %></p>
+      </div>
     </div>
-    <div class="cover-logo-divider"></div>
-    <div class="cover-name">
-      <h1><%= companyName %></h1>
-      <p><%= companyTagline %></p>
+    <div class="cover-ph-meta">
+      <div class="cover-ph-meta-row"><span class="cover-ph-lbl">Report No.</span><span class="cover-ph-val"><%= reportNumber %></span></div>
+      <div class="cover-ph-meta-row"><span class="cover-ph-lbl">Inspected</span><span class="cover-ph-val"><%= inspectionDate %></span></div>
     </div>
-  </div>
-  <div class="cover-accent"></div>
+  </header>
+  <div class="accent-bar"></div>
 
-  <div class="cover-address-block">
-    <div class="address-main"><%= propertyAddress %></div>
-    <div class="address-city"><%= propertyCity %></div>
-  </div>
-
-  <div class="cover-photo-wrap">
-    <img src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/1200x800/1C2B3A/5A6A7A?text=Property+Photo' %>" alt="Property Photo">
+  <div class="cover-photo-card">
+    <img src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/1400x900/1C2B3A/5A6A7A?text=Property+Photo' %>" alt="Property Photo">
     <div class="cover-photo-label"><%= propertyPhotoLabel || 'Front Elevation' %></div>
   </div>
 
-  <div class="cover-meta">
-    <div class="cover-meta-item"><span class="cover-meta-lbl">Report No.</span><span class="cover-meta-val"><%= reportNumber %></span></div>
-    <div class="cover-meta-item"><span class="cover-meta-lbl">File No.</span><span class="cover-meta-val"><%= fileNumber %></span></div>
-    <div class="cover-meta-item"><span class="cover-meta-lbl">Date of Inspection</span><span class="cover-meta-val"><%= inspectionDate %></span></div>
-    <div class="cover-meta-item"><span class="cover-meta-lbl">Inspector</span><span class="cover-meta-val"><%= inspectorName %></span></div>
+  <div class="cover-timeline">
+    <div class="cover-tl-dot"></div>
+    <div class="cover-tl-line"></div>
+    <div class="cover-tl-arrow">▶</div>
   </div>
 
-  <div class="cover-contact">
-    <div class="tagline">Don't Let Your Drain Be A Pain!</div>
-    <div class="phone"><%= companyPhone || '' %></div>
-    <div class="website"><%= companyWebsite || '' %></div>
+  <div class="cover-address">
+    <div class="cover-eyebrow">Sewer Scope Inspection Report</div>
+    <div class="cover-street"><%= propertyAddress %></div>
+    <div class="cover-city"><%= propertyCity %></div>
   </div>
 
-  <div class="cover-legal"><%= footerLegal %></div>
+  <div class="cover-meta-strip">
+    <span>Inspected <%= inspectionDate %></span>
+    <span class="dot">•</span>
+    <span><%= inspectionTime %></span>
+    <span class="dot">•</span>
+    <span>Report <%= reportNumber %></span>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cf-top">
+      <span class="cf-co"><%= companyName %></span>
+      <span class="cf-pg">PAGE <strong>01</strong></span>
+    </div>
+    <div class="cf-legal">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="cf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
+  </div>
 </div>
 
 
@@ -496,9 +572,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong>02</strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong>02</strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 
@@ -536,9 +611,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong>03</strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong>03</strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 
@@ -620,9 +694,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong>04</strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong>04</strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 
@@ -675,9 +748,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong>05</strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong>05</strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 
@@ -736,9 +808,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong><%= String(pages.observations).padStart(2,'0') %></strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.observations).padStart(2,'0') %></strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 <% } %>
@@ -800,9 +871,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong><%= d.pageNum %></strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= d.pageNum %></strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 <% }) %>
@@ -848,9 +918,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong><%= String(pages.recommendations).padStart(2,'0') %></strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.recommendations).padStart(2,'0') %></strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 
@@ -878,9 +947,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong><%= String(pages.statementOfService).padStart(2,'0') %></strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.statementOfService).padStart(2,'0') %></strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 
@@ -922,9 +990,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong><%= String(pages.materials).padStart(2,'0') %></strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.materials).padStart(2,'0') %></strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 <% } %>
@@ -956,9 +1023,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong><%= String(pages.defectsGraphic).padStart(2,'0') %></strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.defectsGraphic).padStart(2,'0') %></strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 <% } %>
@@ -1028,9 +1094,8 @@ body {
   </div>
 
   <footer class="pf">
-    <span class="pf-co"><%= companyName %></span>
-    <span class="pf-leg"><%= footerLegal %></span>
-    <span class="pf-pg">PAGE <strong><%= String(pages.inspectorBio).padStart(2,'0') %></strong></span>
+    <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.inspectorBio).padStart(2,'0') %></strong></span></div>
+    <div class="pf-leg"><%= footerLegal %></div>
   </footer>
 </div>
 <% } %>
