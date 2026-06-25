@@ -104,16 +104,19 @@ body {
 
 /* ══ SHARED FOOTER (all pages) ═══════════════════════════════════ */
 .pf {
+  margin-top: auto;
   border-top: 1px solid var(--color-border);
   padding: 7px var(--ph) 8px;
   flex-shrink: 0;
   background: var(--color-page-bg);
 }
-.pf-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 3px; }
+.pf-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
 .pf-co  { font-size: 7.5pt; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--color-body-text); }
 .pf-pg  { font-size: 7pt; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
 .pf-pg strong { color: var(--color-body-text); }
-.pf-leg { font-size: 6pt; color: var(--color-muted); line-height: 1.5; }
+.pf-leg { font-size: 6pt; color: var(--color-muted); line-height: 1.6; }
+.pf-leg strong { font-weight: 700; color: var(--color-body-text); }
+.pf-copy  { font-size: 6pt; color: var(--color-muted); margin-top: 2px; }
 
 /* ══ INFO TABLE ══════════════════════════════════════════════════ */
 .info-tbl { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
@@ -321,125 +324,97 @@ body {
 .cover-ph {
   background: var(--color-header-bg);
   color: var(--color-header-text);
-  padding: 18px var(--ph);
+  padding: 30px var(--ph);
   display: flex; align-items: center; justify-content: space-between;
   flex-shrink: 0;
 }
-.cover-ph-logo { display: flex; align-items: center; gap: 14px; }
+.cover-ph-logo { display: flex; align-items: center; gap: 20px; }
 .cover-ph-badge {
-  width: 56px; height: 56px; border-radius: 10px;
+  width: 76px; height: 76px; border-radius: 12px;
   background: var(--color-logo-bg);
   display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 20px; color: #fff;
+  font-weight: 900; font-size: 26px; color: #fff;
   letter-spacing: -.5px; flex-shrink: 0; overflow: hidden;
 }
 .cover-ph-badge img { width: 100%; height: 100%; object-fit: cover; }
-.cover-ph-divider { width: 1px; height: 44px; background: rgba(255,255,255,.22); }
-.cover-ph-name h1 { font-size: 17pt; font-weight: 900; letter-spacing: .01em; }
-.cover-ph-name p  { font-size: 9pt; opacity: .70; margin-top: 2px; }
+.cover-ph-divider { width: 1px; height: 60px; background: rgba(255,255,255,.22); }
+.cover-ph-name h1 { font-size: 22pt; font-weight: 900; letter-spacing: .02em; line-height: 1.1; }
+.cover-ph-name p  { font-size: 11pt; opacity: .80; margin-top: 4px; }
 .cover-ph-meta { text-align: right; }
-.cover-ph-meta-row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 2px; }
-.cover-ph-lbl { font-size: 7pt; opacity: .60; letter-spacing: .08em; text-transform: uppercase; }
-.cover-ph-val { font-size: 10pt; font-weight: 800; }
+.cover-ph-meta-group { margin-bottom: 8px; }
+.cover-ph-meta-group:last-child { margin-bottom: 0; }
+.cover-ph-lbl { display: block; font-size: 8pt; opacity: .70; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 2px; }
+.cover-ph-val { display: block; font-size: 12pt; font-weight: 800; letter-spacing: .05em; }
 
 /* Photo card — tall, inset, rounded with shadow */
 .cover-photo-card {
-  margin: 12px 16px 0;
+  margin: 16px var(--ph) 0;
   border-radius: 12px; overflow: hidden;
   border: 1px solid #D8E4EE;
   box-shadow: 0 4px 20px rgba(0,0,0,.16);
   position: relative; flex-shrink: 0;
-  height: 5.1in;
+  height: 6.4in;
   background: #1C2B3A;
 }
 .cover-photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cover-photo-label {
-  position: absolute; bottom: 12px; left: 12px;
+  position: absolute; bottom: 16px; left: 16px;
   background: rgba(13,33,55,.82); color: #fff;
-  font-size: 6.5pt; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
-  padding: 5px 12px; border-radius: 5px;
+  font-size: 7pt; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 6px;
 }
 
-/* Timeline — pure CSS, no SVG, no gradients
-   Thin horizontal line with evenly-spaced tick marks via border-image trick */
+/* Timeline — pure CSS, no SVG, no gradients */
 .cover-timeline {
   display: flex; align-items: center;
-  padding: 10px var(--ph) 0;
-  gap: 6px; flex-shrink: 0;
+  padding: 16px var(--ph) 0;
+  gap: 0; flex-shrink: 0;
 }
 .cover-tl-dot {
-  width: 12px; height: 12px; border-radius: 50%;
+  width: 14px; height: 14px; border-radius: 50%;
   background: var(--color-accent); flex-shrink: 0;
+  border: 3px solid #fff; box-shadow: 0 0 0 1px var(--color-accent);
+  position: relative; z-index: 2;
 }
 .cover-tl-line {
-  flex: 1; height: 10px; flex-shrink: 1;
-  position: relative;
+  flex: 1; height: 2px; background: var(--color-accent);
+  position: relative; opacity: 0.6; margin: 0 -2px; z-index: 1;
 }
-/* Base horizontal line */
-.cover-tl-line::before {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; top: 4px;
-  height: 1.5px;
-  background: var(--color-accent);
-  opacity: .35;
-}
-/* Tick marks: repeating-linear-gradient paints short vertical slices */
 .cover-tl-line::after {
   content: '';
-  position: absolute;
-  left: 0; right: 0; top: 0;
-  height: 10px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--color-accent) 0px,
-    var(--color-accent) 1.5px,
-    transparent 1.5px,
-    transparent 18px
-  );
+  position: absolute; left: 0; right: 0; top: -4px; height: 10px;
+  background: repeating-linear-gradient(90deg, var(--color-accent) 0, var(--color-accent) 1px, transparent 1px, transparent 12.5%);
 }
-.cover-tl-arrow { color: var(--color-accent); font-size: 9pt; flex-shrink: 0; line-height: 1; }
+.cover-tl-arrow {
+  color: var(--color-accent); font-size: 14px; flex-shrink: 0; line-height: 1;
+  position: relative; z-index: 2;
+}
 
 /* Address block */
-.cover-address { padding: 7px var(--ph) 0; flex-shrink: 0; }
+.cover-address { padding: 16px var(--ph) 0; flex-shrink: 0; }
 .cover-eyebrow {
-  font-size: 7.5pt; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--color-accent); margin-bottom: 3px;
+  font-size: 8pt; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--color-accent); margin-bottom: 6px;
 }
 .cover-street {
-  font-size: 34pt; font-weight: 900; line-height: 1;
+  font-size: 38pt; font-weight: 800; line-height: 1.1;
   color: var(--color-body-text); letter-spacing: -.02em;
 }
 .cover-city {
-  font-size: 18pt; font-weight: 600; line-height: 1.2;
-  color: var(--color-muted); margin-top: 4px;
+  font-size: 20pt; font-weight: 500; line-height: 1.2;
+  color: var(--color-muted); margin-top: 2px;
 }
 
 /* Meta strip */
 .cover-meta-strip {
-  padding: 7px var(--ph) 0;
-  font-size: 8pt; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  padding: 12px var(--ph) 0;
+  font-size: 8.5pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
   color: var(--color-muted);
   display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
 .cover-meta-strip .dot { color: var(--color-accent); font-size: 9pt; line-height: 1; }
 
-/* Cover footer */
-.cover-footer {
-  margin-top: auto;
-  border-top: 1px solid var(--color-border);
-  padding: 7px var(--ph) 8px; flex-shrink: 0;
-}
-.cover-footer .cf-top {
-  display: flex; align-items: baseline; justify-content: space-between;
-  margin-bottom: 4px;
-}
-.cf-co    { font-size: 7.5pt; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--color-body-text); }
-.cf-pg    { font-size: 7pt; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
-.cf-pg strong { color: var(--color-body-text); }
-.cf-legal { font-size: 6pt; color: var(--color-muted); line-height: 1.6; }
-.cf-legal strong { font-weight: 700; color: var(--color-body-text); }
-.cf-copy  { font-size: 6pt; color: var(--color-muted); margin-top: 2px; }
+
 
 /* ══ PROPERTY PHOTO ON CLIENT PAGE ════════════════════════════════ */
 .client-layout { display: grid; grid-template-columns: 1fr 200px; gap: 16px; align-items: start; }
@@ -468,8 +443,8 @@ body {
       </div>
     </div>
     <div class="cover-ph-meta">
-      <div class="cover-ph-meta-row"><span class="cover-ph-lbl">Report No.</span><span class="cover-ph-val"><%= reportNumber %></span></div>
-      <div class="cover-ph-meta-row"><span class="cover-ph-lbl">Inspected</span><span class="cover-ph-val"><%= inspectionDate %></span></div>
+      <div class="cover-ph-meta-group"><span class="cover-ph-lbl">Report No.</span><span class="cover-ph-val"><%= reportNumber %></span></div>
+      <div class="cover-ph-meta-group"><span class="cover-ph-lbl">Inspected</span><span class="cover-ph-val"><%= inspectionDate %></span></div>
     </div>
   </header>
   <div class="accent-bar"></div>
@@ -499,17 +474,17 @@ body {
     <span>Report <%= reportNumber %></span>
   </div>
 
-  <div class="cover-footer">
-    <div class="cf-top">
-      <span class="cf-co"><%= companyName %></span>
-      <span class="cf-pg">PAGE <strong>01</strong></span>
+  <footer class="pf">
+    <div class="pf-top">
+      <span class="pf-co"><%= companyName %></span>
+      <span class="pf-pg">PAGE <strong>01</strong></span>
     </div>
-    <div class="cf-legal">
+    <div class="pf-leg">
       Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
       <strong>Not to be used for the purpose of substitute disclosure.</strong>
     </div>
-    <div class="cf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
-  </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
+  </footer>
 </div>
 
 
@@ -612,7 +587,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong>03</strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 
@@ -695,7 +674,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong>04</strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 
@@ -749,7 +732,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong>05</strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 
@@ -809,7 +796,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.observations).padStart(2,'0') %></strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 <% } %>
@@ -872,7 +863,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= d.pageNum %></strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 <% }) %>
@@ -919,7 +914,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.recommendations).padStart(2,'0') %></strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 
@@ -948,7 +947,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.statementOfService).padStart(2,'0') %></strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 
@@ -991,7 +994,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.materials).padStart(2,'0') %></strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 <% } %>
@@ -1024,7 +1031,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.defectsGraphic).padStart(2,'0') %></strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 <% } %>
@@ -1095,7 +1106,11 @@ body {
 
   <footer class="pf">
     <div class="pf-top"><span class="pf-co"><%= companyName %></span><span class="pf-pg">PAGE <strong><%= String(pages.inspectorBio).padStart(2,'0') %></strong></span></div>
-    <div class="pf-leg"><%= footerLegal %></div>
+    <div class="pf-leg">
+      Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client.
+      <strong>Not to be used for the purpose of substitute disclosure.</strong>
+    </div>
+    <div class="pf-copy">© <%= new Date().getFullYear() %> <%= companyName %>. All rights reserved.</div>
   </footer>
 </div>
 <% } %>
