@@ -1294,18 +1294,18 @@
 
             <% if (hasDefects) { %>
               <li class="toc-grp">Defect Findings</li>
-              <% defects.forEach(function(d) { %>
-                <li class="toc-item">
-                  <span class="toc-lbl">
-                    <%= d.severityIcon %> &nbsp;Defect <%= d.num %> — <%= d.title %>
-                  </span>
-                  <span class="toc-dots"></span>
-                  <span class="toc-pg">
-                    <%= d.pageNum %>
-                  </span>
-                </li>
-                <% }) %>
+              <li class="toc-item">
+                <span class="toc-lbl">Defects</span>
+                <span class="toc-dots"></span>
+                <span class="toc-pg">
+                  <% if (defects.length > 1) { %>
+                    <%= defects[0].pageNum %>-<%= defects[defects.length - 1].pageNum %>
+                  <% } else { %>
+                    <%= defects[0].pageNum %>
                   <% } %>
+                </span>
+              </li>
+            <% } %>
 
                     <li class="toc-grp">Summary &amp; Appendix</li>
                     <li class="toc-item"><span class="toc-lbl">Recommendations &amp; Notes</span><span
