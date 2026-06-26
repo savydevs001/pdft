@@ -198,6 +198,7 @@ input[type=color] {
         <div class="ctrl-section-title">Inspector</div>
         <label>Inspector Name</label><input type="text" id="inspectorName" value="Marcus R. Delgado">
         <label>License / Credential</label><input type="text" id="inspectorLicense" value="License #NV-SI-20891">
+        <label>Inspector Photo URL (blank = placeholder)</label><input type="url" id="inspectorPhotoUrl" placeholder="https://...">
       </div>
 
     </div>
@@ -249,6 +250,13 @@ Branch: Kitchen lateral</textarea>
       </div>
 
       <div class="ctrl-section">
+        <div class="ctrl-section-title">Sewer System Photos</div>
+        <div style="font-size:7pt;color:#5A7A8A;margin-bottom:8px;">Add 2–3 photos of the property/site and cleanout location. These appear below the Sewer System Information table on page 4.</div>
+        <div id="sewer-photos-list"></div>
+        <button class="btn-add" id="btn-add-sewer-photo">+ Add Site Photo</button>
+      </div>
+
+      <div class="ctrl-section">
         <div class="ctrl-section-title">Video Links</div>
         <div id="video-links-list"></div>
         <button class="btn-add" id="btn-add-video">+ Add Video Link</button>
@@ -283,6 +291,13 @@ Branch: Kitchen lateral</textarea>
         <textarea id="additionalNotes" placeholder="Any additional notes for the client..."></textarea>
       </div>
 
+      <div class="ctrl-section">
+        <div class="ctrl-section-title">Extra Narrative Sections <span style="color:#5A7A8A;font-weight:400;">(appended after Recommendations)</span></div>
+        <div style="font-size:7pt;color:#5A7A8A;margin-bottom:8px;">Add custom sections like Narratives, just as in page 3. Each gets a heading and body text.</div>
+        <div id="rec-extra-list"></div>
+        <button class="btn-add" id="btn-add-rec-extra">+ Add Section</button>
+      </div>
+
     </div>
 
     <!-- ── PANEL: APPENDIX / LEGAL ── -->
@@ -306,25 +321,17 @@ Branch: Kitchen lateral</textarea>
 
       <div class="ctrl-section">
         <div class="ctrl-section-title">Disclosure Text</div>
-        <textarea id="disclosureText" style="min-height:100px;">This report is intended to be used only as a general guide in order to provide our clients with current condition of the home's and/or building's main sewer line. The report expresses the opinion of the inspector, based upon visual impressions of the conditions that existed at the time of the inspection only.
-
-The inspection report should not be construed as a compliance inspection of any governmental or non-governmental codes or regulations. The report is not intended to be a warranty or guarantee of the present or future adequacy or performance of the sewer line.
-
-LVSI certifies that our inspectors have no interest, present or contemplated, in the listed property or its improvement. Additionally, LVSI has no involvement with trade professionals or benefits derived from any sales, repairs, replacements, modifications or improvements from inspected sewer lines.
-
-All repairs should be done by a competent licensed Plumber and any work requiring building permits should be obtained by the authority having jurisdiction (Local Building Department).
-
-It is the client's sole responsibility to read this report in its entirety, not rely upon any verbal comments and to research any and all jurisdictional permits required by the local authorities regarding the property inspected.</textarea>
+        <textarea id="disclosureText" style="min-height:100px;">{Company} certifies that our inspectors have no interest, present or contemplated, in the listed property or its improvement. Additionally, {Company} has no involvement with trade professionals or benefits derived from any sales, repairs, replacements, modifications or improvements from inspected sewer lines. To the best of our knowledge and belief all statements and information in this report are true and correct based off of technical training, field training, and overall industry experience. All repairs should be done by a competent licensed Plumber and any work requiring building permits should be obtained by the authority having jurisdiction (Local Building Department). This is the best assurance that the repairs are done correctly and protects the interested party. See the report below for detailed descriptions of findings and recommendations. It is the client’s sole responsibility to read this report in its entirety, not rely upon any verbal comments and to research any and all jurisdictional permits required by the local authorities regarding the property inspected.</textarea>
       </div>
 
       <div class="ctrl-section">
         <div class="ctrl-section-title">Scope of Inspection</div>
-        <textarea id="scopeText" style="min-height:80px;">A sewer inspection scan was requested of the main drain line from the structure to the city, private sewer connection, 150 feet or camera limitations (whichever comes first). The sewer line is to be accessed through a cleanout, roof vent (single story only) or other access point(s) to be determined best by the inspector. The camera inspection does not inspect all of the drain lines running under or within the structure. The following is a summative report of the findings.</textarea>
+        <textarea id="scopeText" style="min-height:80px;">A sewer inspection scan was requested of the main drain line from the structure to the city, private sewer connection, 150 feet or camera limitations (whichever comes first). The sewer line is to be accessed through a cleanout, roof vent (single story only) or other access point(s) to be determined best by the inspector. The camera inspection does not inspect all of the drain lines running under and or within the structure. The following is a summative report of the findings. If a video was completed, it will be posted on You Tube with the URL provided to promote understanding and transparency with our clients.</textarea>
       </div>
 
       <div class="ctrl-section">
         <div class="ctrl-section-title">Point of Reference</div>
-        <textarea id="pointOfReference" style="min-height:70px;">Statements made within this inspection report pertaining to left, right, front or rear were referenced by standing in front of and facing the structure from the street. Additionally, analogue clockface references may be utilized to pinpoint conditions found within the pipe; in this case the 12 o'clock position will be the topmost center of the pipe, the 6 o'clock position will be the bottom most center of the pipe and so on.</textarea>
+        <textarea id="pointOfReference" style="min-height:70px;">This inspection evaluates the main sewer lateral from the structure to the municipal main or private sewer connection, up to a maximum distance of 150 feet or the physical limitations of the camera equipment (whichever comes first). The sewer line is accessed via an exterior cleanout, a single-story roof vent, or another access point deemed safest and most effective by the inspector. This inspection is strictly limited to the primary main line and does not evaluate secondary drain lines running beneath or within the interior structure. The following is a summary of our findings. If a video recording was completed, it will be uploaded to YouTube with the private URL link provided below to ensure full transparency and understanding.</textarea>
       </div>
 
       <div class="ctrl-section">
@@ -448,7 +455,7 @@ function processData(raw) {
   const defects = (raw.defects || []).map((d, i) => {
     const sev    = SEV[d.severity] || SEV.minor;
     const photos = resolvePhotos(d.photos);
-    return { ...d, ...sev, num: pad(i + 1), photos, gridClass: photoGridClass(photos), hasPhotos: true };
+    return { ...d, ...sev, num: pad(i + 1), photos, gridClass: photoGridClass(photos), hasPhotos: true, useSeverityScale: d.useSeverityScale !== false };
   });
 
   const observations = (raw.observations || []).map(o => {
@@ -497,6 +504,9 @@ function processData(raw) {
     videoLinks,
     inspectorCredentials,
     inspectorExperience,
+    sewerSystemPhotos: (raw.sewerSystemPhotos || []).filter(p => p && p.url && p.url.trim()),
+    recExtraSections:  raw.recExtraSections || [],
+    inspectorPhotoUrl: raw.inspectorPhotoUrl || '',
     hasDefects:         defects.length > 0,
     hasObservations,
     hasVideoLinks:      videoLinks.length > 0,
@@ -549,6 +559,10 @@ function addDefect(data = {}) {
     <input type="text" class="d-feet" value="${data.feet || ''}">
     <label>Narrative</label>
     <textarea class="d-narrative" style="min-height:60px;">${data.narrative || ''}</textarea>
+    <div class="checkbox-row" style="margin-top:6px;">
+      <input type="checkbox" class="d-use-sev" ${data.useSeverityScale !== false ? 'checked' : ''} style="width:14px;height:14px;accent-color:#1AAFB4;flex-shrink:0;">
+      <label style="margin:0;font-size:7.5pt;color:#C8D8E4;">Use severity scale (uncheck for grey/informational banner)</label>
+    </div>
     <label>Photos (URLs — blank = placeholder)</label>
     <div class="photo-inputs">
       ${(data.photos || ['','']).map((url, pi) => `
@@ -560,6 +574,40 @@ function addDefect(data = {}) {
     <button class="btn-add-photo" onclick="addPhotoRow(this)">+ Add photo slot</button>
   `;
   document.getElementById('defect-list').appendChild(el);
+}
+
+function addSewerPhoto(data = {}) {
+  const el = document.createElement('div');
+  el.className = 'rec-row';
+  el.style.cssText = 'flex-direction:column;gap:4px;background:#0F2030;border:1px solid #1A2E40;border-radius:5px;padding:8px;margin-bottom:6px;';
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:7.5pt;font-weight:700;color:#C8D8E4;">Site Photo</span>
+      <button class="btn-rm-rec" onclick="this.closest('.rec-row').remove()">✕</button>
+    </div>
+    <label style="margin-top:4px;">Photo URL</label>
+    <input type="url" class="sp-url" value="${data.url || ''}" placeholder="https://...">
+    <label>Caption (e.g. Front Elevation, Cleanout Location)</label>
+    <input type="text" class="sp-caption" value="${data.caption || ''}" placeholder="Cleanout Location">
+  `;
+  document.getElementById('sewer-photos-list').appendChild(el);
+}
+
+function addRecExtra(data = {}) {
+  const el = document.createElement('div');
+  el.className = 'rec-row';
+  el.style.cssText = 'flex-direction:column;gap:4px;background:#0F2030;border:1px solid #1A2E40;border-radius:5px;padding:8px;margin-bottom:6px;';
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:7.5pt;font-weight:700;color:#C8D8E4;">Extra Section</span>
+      <button class="btn-rm-rec" onclick="this.closest('.rec-row').remove()">✕</button>
+    </div>
+    <label style="margin-top:4px;">Section Heading</label>
+    <input type="text" class="re-heading" value="${data.heading || ''}" placeholder="Narratives">
+    <label>Body Text</label>
+    <textarea class="re-body" style="min-height:70px;">${data.body || ''}</textarea>
+  `;
+  document.getElementById('rec-extra-list').appendChild(el);
 }
 
 function addPhotoRow(btn) {
@@ -641,6 +689,7 @@ function collectFormData() {
     feet:      card.querySelector('.d-feet').value,
     narrative: card.querySelector('.d-narrative').value,
     photos:    [...card.querySelectorAll('.d-photo')].map(i => i.value),
+    useSeverityScale: card.querySelector('.d-use-sev') ? card.querySelector('.d-use-sev').checked : true,
   }));
 
   const observations = [...document.querySelectorAll('.obs-card')].map(card => ({
@@ -676,6 +725,7 @@ function collectFormData() {
     // inspector
     inspectorName:    v('inspectorName'),
     inspectorLicense: v('inspectorLicense'),
+    inspectorPhotoUrl: v('inspectorPhotoUrl'),
     inspectorBioHeadline:  v('inspectorBioHeadline'),
     inspectorCredentials:  v('inspectorCredentials'),
     inspectorExperience:   v('inspectorExperience'),
@@ -702,12 +752,20 @@ function collectFormData() {
     sewerLength:       v('sewerLength'),
     cameraDirections:  v('cameraDirections'),
     systemNotes:       v('systemNotes'),
+    sewerSystemPhotos: [...document.querySelectorAll('#sewer-photos-list .rec-row')].map(row => ({
+      url:     row.querySelector('.sp-url').value,
+      caption: row.querySelector('.sp-caption').value,
+    })).filter(p => p.url),
     videoLinks,
     // arrays
     observations,
     defects,
     recommendations,
     additionalNotes: v('additionalNotes'),
+    recExtraSections: [...document.querySelectorAll('#rec-extra-list .rec-row')].map(row => ({
+      heading: row.querySelector('.re-heading').value,
+      body:    row.querySelector('.re-body').value,
+    })).filter(s => s.heading || s.body),
     // toggles
     showMaterialsPage:   checked('showMaterialsPage'),
     showInspectorBio:    checked('showInspectorBio'),
@@ -846,6 +904,8 @@ document.getElementById('btn-add-defect').addEventListener('click', () => addDef
 document.getElementById('btn-add-obs').addEventListener('click', () => addObservation());
 document.getElementById('btn-add-video').addEventListener('click', () => addVideoLink());
 document.getElementById('btn-add-rec').addEventListener('click', () => addRec());
+document.getElementById('btn-add-sewer-photo').addEventListener('click', () => addSewerPhoto());
+document.getElementById('btn-add-rec-extra').addEventListener('click', () => addRecExtra());
 
 document.getElementById('showDefectsGraphic').addEventListener('change', function() {
   document.getElementById('graphic-url-wrap').style.display = this.checked ? 'block' : 'none';

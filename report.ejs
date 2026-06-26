@@ -682,13 +682,13 @@
 
     .photo-cell img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
       display: block;
     }
 
     .photo-grid.cols-1 .photo-cell img {
-      height: 260px;
+      height: 200px;
     }
 
     .photo-num {
@@ -1139,6 +1139,137 @@
       padding: 4px;
       background: var(--color-row-alt);
       color: var(--color-muted);
+    }
+
+    /* ══ SEWER SYSTEM PHOTO GRID ══════════════════════════════════════ */
+    .sewer-photo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .sewer-photo-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .sewer-photo-cell {
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      position: relative;
+    }
+    .sewer-photo-cell img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+    }
+    .sewer-photo-caption {
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-align: center;
+      padding: 4px;
+      background: var(--color-row-alt);
+      color: var(--color-muted);
+      text-transform: uppercase;
+    }
+
+    /* ══ DEFECT / DISCOVERY BANNER — full color ══════════════════════ */
+    /* Override old header background to use severity color */
+    .defect-hd-c {
+      background: transparent !important;
+    }
+    .defect-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      flex: 1;
+    }
+    .defect-banner.banner-none  { background: var(--sev-none-bg);  border-left: none; }
+    .defect-banner.banner-minor { background: var(--sev-minor-bg); }
+    .defect-banner.banner-mod   { background: var(--sev-mod-bg);   }
+    .defect-banner.banner-major { background: var(--sev-major-bg); }
+    .defect-banner.banner-maint { background: var(--sev-maint-bg); }
+    /* default/no-severity grey */
+    .defect-banner.banner-default { background: #EAEEF2; }
+
+    .defect-banner .defect-num {
+      font-size: 7pt;
+      font-weight: 800;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 2px;
+    }
+    .defect-banner .defect-ttl {
+      font-size: 12pt;
+      font-weight: 800;
+      color: var(--color-body-text);
+      margin: 2px 0;
+    }
+    .defect-banner .defect-loc {
+      font-size: 7.5pt;
+      color: var(--color-muted);
+    }
+    .defect-banner .defect-loc span { font-weight: 700; color: var(--color-body-text); }
+
+    /* ══ RECOMMENDATIONS — symbol bullets ════════════════════════════ */
+    .rec-symbol {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: #fff;
+      font-size: 12pt;
+      line-height: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* ══ REC EXTRA SECTIONS (like Narratives) ════════════════════════ */
+    .rec-extra-section {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--color-border);
+    }
+    .rec-extra-section h3 {
+      font-size: 10pt;
+      font-weight: 800;
+      color: var(--color-body-text);
+      margin-bottom: 8px;
+    }
+    .rec-extra-section .rec-extra-body {
+      font-size: 9.5pt;
+      line-height: 1.7;
+      color: var(--color-body-text);
+    }
+
+    /* ══ INSPECTOR PHOTO ══════════════════════════════════════════════ */
+    .bio-layout {
+      display: grid;
+      grid-template-columns: 1fr 160px;
+      gap: 18px;
+      align-items: start;
+    }
+    .inspector-photo {
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+    .inspector-photo img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .inspector-photo-label {
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-align: center;
+      padding: 4px;
+      background: var(--color-row-alt);
+      color: var(--color-muted);
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -1597,6 +1728,19 @@
                       </tr>
                       <% } %>
       </table>
+
+      <%# Sewer system / cleanout photos — 2 or 3 photos %>
+      <% var swPhotos = (sewerSystemPhotos || []).filter(function(p){ return p && p.url && p.url.trim(); }); %>
+      <% if (swPhotos.length > 0) { %>
+        <div class="sewer-photo-grid <%= swPhotos.length >= 3 ? 'cols-3' : '' %>">
+          <% swPhotos.forEach(function(sp) { %>
+            <div class="sewer-photo-cell">
+              <img src="<%= sp.url %>" alt="<%= sp.caption || 'Site Photo' %>">
+              <div class="sewer-photo-caption"><%= sp.caption || 'Site Photo' %></div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
     </div>
 
     <footer class="pf">
@@ -1869,7 +2013,7 @@
           <div class="pc">
             <div class="sh">
               <div class="sh-bar"></div>
-              <h2>Defect Findings</h2>
+              <h2>Sewer Pipe Conditions / Discovery</h2>
               <span class="sh-num">Section <%= hasObservations ? '06' : '05' %> — Finding <%= d.num %> of <%=
                       defectCount %></span>
             </div>
@@ -1877,10 +2021,9 @@
             <div class="defect">
               <div class="defect-hd">
                 <div class="defect-stripe stripe-<%= d.severityCss %>"></div>
-                <div class="defect-hd-c">
+                <div class="defect-banner banner-<%= d.useSeverityScale !== false ? d.severityCss : 'default' %>">
                   <div>
-                    <div class="defect-num">Defect <%= d.num %>
-                    </div>
+                    <div class="defect-num">D<%= d.num %></div>
                     <div class="defect-ttl">
                       <%= d.title %>
                     </div>
@@ -1890,6 +2033,7 @@
                         <%= d.feet %> ft
                       </span></div>
                   </div>
+                  <% if (d.useSeverityScale !== false) { %>
                   <div class="defect-badge badge-<%= d.severityCss %>">
                     <span class="defect-badge-icon">
                       <%= d.severityIcon %>
@@ -1899,6 +2043,7 @@
                         <%= d.severitySub %>
                       </span>
                   </div>
+                  <% } %>
                 </div>
               </div>
               <div class="defect-body">
@@ -1969,15 +2114,13 @@
             <div class="pc">
               <div class="sh">
                 <div class="sh-bar"></div>
-                <h2>End of Report — Recommendations</h2><span class="sh-num">Section 06</span>
+                <h2>Recommendations</h2><span class="sh-num">Section 06</span>
               </div>
               <% if (hasRecommendations) { %>
                 <ul class="rec-list">
                   <% recommendations.forEach(function(r, i) { %>
                     <li class="rec-item">
-                      <div class="rec-num">
-                        <%= i+1 %>
-                      </div>
+                      <div class="rec-symbol">◆</div>
                       <div>
                         <%= r %>
                       </div>
@@ -1996,6 +2139,16 @@
                       </div>
                       <div class="notes"><%- additionalNotes %></div>
                       <% } %>
+
+                    <%# Extra narrative sections (like Narratives page 3) %>
+                    <% if (recExtraSections && recExtraSections.length > 0) { %>
+                      <% recExtraSections.forEach(function(sec) { %>
+                        <div class="rec-extra-section">
+                          <h3><%= sec.heading %></h3>
+                          <div class="rec-extra-body"><%- sec.body.split('\n').map(function(p){ return p.trim() ? '<p style="margin-bottom:8px;">'+p+'</p>' : ''; }).join('') %></div>
+                        </div>
+                      <% }); %>
+                    <% } %>
             </div>
 
             <footer class="pf">
@@ -2260,46 +2413,58 @@
                           <div class="sh-bar"></div>
                           <h2>Meet Your Inspector</h2>
                         </div>
-                        <div style="font-size:10pt;font-weight:800;margin-bottom:8px;">
-                          <%= inspectorName %> &nbsp;<span
-                              style="font-weight:400;font-size:8.5pt;color:var(--color-muted);">— <%= inspectorLicense
-                                %></span>
-                        </div>
 
-                        <% if (inspectorBioHeadline) { %>
-                          <div class="bio-headline">
-                            <%= inspectorBioHeadline %>
-                          </div>
-                          <% } %>
+                        <div class="bio-layout">
+                          <div>
+                            <div style="font-size:10pt;font-weight:800;margin-bottom:8px;">
+                              <%= inspectorName %> &nbsp;<span
+                                  style="font-weight:400;font-size:8.5pt;color:var(--color-muted);">— <%= inspectorLicense
+                                    %></span>
+                            </div>
 
-                            <% if (inspectorCredentials && inspectorCredentials.length> 0) { %>
-                              <div class="bio-section">
-                                <h3>Certifications &amp; Training</h3>
-                                <ul class="bio-list">
-                                  <% inspectorCredentials.forEach(function(c) { %>
-                                    <li>
-                                      <%= c %>
-                                    </li>
-                                    <% }) %>
-                                </ul>
+                            <% if (inspectorBioHeadline) { %>
+                              <div class="bio-headline">
+                                <%= inspectorBioHeadline %>
                               </div>
                               <% } %>
 
-                                <% if (inspectorExperience && inspectorExperience.length> 0) { %>
+                                <% if (inspectorCredentials && inspectorCredentials.length> 0) { %>
                                   <div class="bio-section">
-                                    <h3>Industry Experience</h3>
+                                    <h3>Certifications &amp; Training</h3>
                                     <ul class="bio-list">
-                                      <% inspectorExperience.forEach(function(e) { %>
+                                      <% inspectorCredentials.forEach(function(c) { %>
                                         <li>
-                                          <%= e %>
+                                          <%= c %>
                                         </li>
                                         <% }) %>
                                     </ul>
                                   </div>
                                   <% } %>
 
-                                    <% if (inspectorWaysAndMeans) { %>
+                                    <% if (inspectorExperience && inspectorExperience.length> 0) { %>
                                       <div class="bio-section">
+                                        <h3>Industry Experience</h3>
+                                        <ul class="bio-list">
+                                          <% inspectorExperience.forEach(function(e) { %>
+                                            <li>
+                                              <%= e %>
+                                            </li>
+                                            <% }) %>
+                                        </ul>
+                                      </div>
+                                      <% } %>
+                          </div>
+
+                          <div>
+                            <div class="inspector-photo">
+                              <img src="<%= inspectorPhotoUrl && inspectorPhotoUrl.trim() ? inspectorPhotoUrl : 'https://placehold.co/320x320/1C2B3A/5A6A7A?text=Inspector+Photo' %>" alt="Inspector">
+                              <div class="inspector-photo-label"><%= inspectorName %></div>
+                            </div>
+                          </div>
+                        </div>
+
+                                    <% if (inspectorWaysAndMeans) { %>
+                                      <div class="bio-section" style="margin-top:14px;">
                                         <h3>Ways &amp; Means</h3>
                                         <div class="legal-text">
                                           <p>

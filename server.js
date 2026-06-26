@@ -87,6 +87,7 @@ function processData(raw) {
       photos,
       gridClass: photoGridClass(photos),
       hasPhotos: true, // always true now — placeholders fill gaps
+      useSeverityScale: d.useSeverityScale !== false, // default true
     };
   });
 
@@ -155,6 +156,11 @@ function processData(raw) {
     videoLinks,
     inspectorCredentials,
     inspectorExperience,
+
+    // ── new fields ──
+    sewerSystemPhotos: (raw.sewerSystemPhotos || []).filter(p => p && p.url && p.url.trim()),
+    recExtraSections:  raw.recExtraSections || [],
+    inspectorPhotoUrl: raw.inspectorPhotoUrl || '',
 
     // ── flags ──
     hasDefects:         defects.length > 0,

@@ -11,6 +11,7 @@
     "companyWebsite": "www.LVSewerInspections.com",
     "inspectorName": "Marcus R. Delgado",
     "inspectorLicense": "License #NV-SI-20891",
+    "inspectorPhotoUrl": "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
     "inspectorBioHeadline": "Heath is the owner and operator of LV Sewer Inspections with training, certification, and degrees from a variety of organizations.",
     "inspectorCredentials": "InternNACHI certified for Sewer Scopes/Inspections\nOSHA 10-hr, 30-hr, HAZWHOPER 40-hr, OSHA 511, and OSHA 501\nAssociate and bachelor's degree in occupational health and safety\nLean Six SIGMA white, yellow and green belt certified\nBorescope Certified by the U.S Air Force since 2010",
     "inspectorExperience": "Completed Sewer Inspections across three states spanning Alaska, California, and Nevada since 2021\nOwner and sole administrator of Sewer Scope Education and Training that Mentors 1,400+ plumbers and inspectors online",
@@ -37,6 +38,20 @@
     "sewerLength": "87",
     "cameraDirections": "Main Line: Downstream from cleanout\nBranch: Kitchen lateral",
     "systemNotes": "",
+    "sewerSystemPhotos": [
+        {
+            "url": "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+            "caption": "Front Elevation"
+        },
+        {
+            "url": "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+            "caption": "Cleanout Location — Rear of Home"
+        },
+        {
+            "url": "https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg",
+            "caption": "Cleanout Access Point"
+        }
+    ],
     "videoLinks": [
         {
             "label": "Main Line Full Run",
@@ -102,6 +117,7 @@
         {
             "title": "Root Intrusion — Fine Hairline",
             "severity": "minor",
+            "useSeverityScale": true,
             "time": "0:42",
             "feet": "12",
             "narrative": "At approximately 0 min: 42 sec / 12 ft, fine hairline root intrusion was observed entering through the bell joint. The intrusion does not currently restrict hydraulic flow.",
@@ -114,6 +130,7 @@
         {
             "title": "Offset Joint — Physical Lip",
             "severity": "moderate",
+            "useSeverityScale": true,
             "time": "2:15",
             "feet": "38",
             "narrative": "At approximately 2 min: 15 sec / 38 ft, a measurable offset joint was identified creating a physical lip on the invert. Scheduled repair is recommended.",
@@ -125,6 +142,7 @@
         {
             "title": "Fractured Pipe Wall — Structural Failure",
             "severity": "major",
+            "useSeverityScale": true,
             "time": "3:58",
             "feet": "61",
             "narrative": "At approximately 3 min: 58 sec / 61 ft, a circumferential fracture spanning 270° was observed. Structural integrity is critically compromised. Immediate intervention required.",
@@ -141,14 +159,20 @@
         "Re-inspect root intrusion at 12 ft in 12 months."
     ],
     "additionalNotes": "",
+    "recExtraSections": [
+        {
+            "heading": "Narratives",
+            "body": "The inspector observed normal wear patterns consistent with the age of the structure. The system performed within expected parameters given the pipe material and installation date. Property owner should maintain annual inspection intervals to track progression of noted conditions."
+        }
+    ],
     "showMaterialsPage": true,
     "showInspectorBio": true,
     "showDefectsGraphic": false,
     "defectsGraphicUrl": "",
     "footerLegal": "Prepared exclusively for the named client. Not to be used for the purpose of substitute disclosure.",
-    "disclosureText": "This report is intended to be used only as a general guide in order to provide our clients with current condition of the home's and/or building's main sewer line. The report expresses the opinion of the inspector, based upon visual impressions of the conditions that existed at the time of the inspection only.\n\nThe inspection report should not be construed as a compliance inspection of any governmental or non-governmental codes or regulations. The report is not intended to be a warranty or guarantee of the present or future adequacy or performance of the sewer line.\n\nLVSI certifies that our inspectors have no interest, present or contemplated, in the listed property or its improvement. Additionally, LVSI has no involvement with trade professionals or benefits derived from any sales, repairs, replacements, modifications or improvements from inspected sewer lines.\n\nAll repairs should be done by a competent licensed Plumber and any work requiring building permits should be obtained by the authority having jurisdiction (Local Building Department).\n\nIt is the client's sole responsibility to read this report in its entirety, not rely upon any verbal comments and to research any and all jurisdictional permits required by the local authorities regarding the property inspected.",
-    "scopeText": "A sewer inspection scan was requested of the main drain line from the structure to the city, private sewer connection, 150 feet or camera limitations (whichever comes first). The sewer line is to be accessed through a cleanout, roof vent (single story only) or other access point(s) to be determined best by the inspector. The camera inspection does not inspect all of the drain lines running under or within the structure. The following is a summative report of the findings.",
-    "pointOfReference": "Statements made within this inspection report pertaining to left, right, front or rear were referenced by standing in front of and facing the structure from the street. Additionally, analogue clockface references may be utilized to pinpoint conditions found within the pipe; in this case the 12 o'clock position will be the topmost center of the pipe, the 6 o'clock position will be the bottom most center of the pipe and so on.",
+    "disclosureText": "{Company} certifies that our inspectors have no interest, present or contemplated, in the listed property or its improvement. Additionally, {Company} has no involvement with trade professionals or benefits derived from any sales, repairs, replacements, modifications or improvements from inspected sewer lines. To the best of our knowledge and belief all statements and information in this report are true and correct based off of technical training, field training, and overall industry experience. All repairs should be done by a competent licensed Plumber and any work requiring building permits should be obtained by the authority having jurisdiction (Local Building Department). This is the best assurance that the repairs are done correctly and protects the interested party. See the report below for detailed descriptions of findings and recommendations. It is the client's sole responsibility to read this report in its entirety, not rely upon any verbal comments and to research any and all jurisdictional permits required by the local authorities regarding the property inspected.",
+    "scopeText": "A sewer inspection scan was requested of the main drain line from the structure to the city, private sewer connection, 150 feet or camera limitations (whichever comes first). The sewer line is to be accessed through a cleanout, roof vent (single story only) or other access point(s) to be determined best by the inspector. The camera inspection does not inspect all of the drain lines running under and or within the structure. The following is a summative report of the findings. If a video was completed, it will be posted on You Tube with the URL provided to promote understanding and transparency with our clients.",
+    "pointOfReference": "This inspection evaluates the main sewer lateral from the structure to the municipal main or private sewer connection, up to a maximum distance of 150 feet or the physical limitations of the camera equipment (whichever comes first). The sewer line is accessed via an exterior cleanout, a single-story roof vent, or another access point deemed safest and most effective by the inspector. This inspection is strictly limited to the primary main line and does not evaluate secondary drain lines running beneath or within the interior structure. The following is a summary of our findings. If a video recording was completed, it will be uploaded to YouTube with the private URL link provided below to ensure full transparency and understanding.",
     "statementOfService": "LV Sewer Inspections was retained for a survey of the listed structure's main sewer line in an effort to identify any areas of suspect blockages, deficiencies or damage and to document the areas for further review and or action by associated trades professional. Further investigations into these areas or destructive testing may reveal additional conditions that were not readily visible at the time of inspection. This report is based on information obtained at the site at the given date and time of the inspection.\n\nThis report is for the exclusive use of our client and is not intended for any other purpose. The report is based on the information available to us at the time as described in the report. Should additional information become available at a later date, we reserve the right to determine the impact, if any, the new information may have on our discovery and recommendations and to revise our opinions and conclusions if necessary and warranted.\n\nWe recommend all areas we locate in this report showing anomalies should be evaluated further to find out the cause and be repaired. Our recommendations are not intended as criticisms of the structure, but rather as professional opinions regarding conditions that we observed at the time of our inspection.",
     "sevNoneDef": "No actionable deficiencies were observed at the time of inspection. This classification documents the system's baseline attributes—such as pipe material (e.g., PVC, Cast Iron, ABS), flow direction, and general configuration. It establishes a structural and operational benchmark for future maintenance or comparative assessments.",
     "sevNoneEg": "Field Examples: Standard joint alignments, unobstructed flow, smooth transitions, or the identification and location of an accessible cleanout.",
