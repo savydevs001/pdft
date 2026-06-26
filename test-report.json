@@ -113,11 +113,11 @@
             ]
         }
     ],
+    "useSeverityScale": true,
     "defects": [
         {
             "title": "Root Intrusion — Fine Hairline",
             "severity": "minor",
-            "useSeverityScale": true,
             "time": "0:42",
             "feet": "12",
             "narrative": "At approximately 0 min: 42 sec / 12 ft, fine hairline root intrusion was observed entering through the bell joint. The intrusion does not currently restrict hydraulic flow.",
@@ -130,7 +130,6 @@
         {
             "title": "Offset Joint — Physical Lip",
             "severity": "moderate",
-            "useSeverityScale": true,
             "time": "2:15",
             "feet": "38",
             "narrative": "At approximately 2 min: 15 sec / 38 ft, a measurable offset joint was identified creating a physical lip on the invert. Scheduled repair is recommended.",
@@ -142,7 +141,6 @@
         {
             "title": "Fractured Pipe Wall — Structural Failure",
             "severity": "major",
-            "useSeverityScale": true,
             "time": "3:58",
             "feet": "61",
             "narrative": "At approximately 3 min: 58 sec / 61 ft, a circumferential fracture spanning 270° was observed. Structural integrity is critically compromised. Immediate intervention required.",
@@ -159,7 +157,7 @@
         "Re-inspect root intrusion at 12 ft in 12 months."
     ],
     "additionalNotes": "",
-    "recExtraSections": [
+    "statementOfServiceExtraSections": [
         {
             "heading": "Narratives",
             "body": "The inspector observed normal wear patterns consistent with the age of the structure. The system performed within expected parameters given the pipe material and installation date. Property owner should maintain annual inspection intervals to track progression of noted conditions."

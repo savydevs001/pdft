@@ -76,6 +76,8 @@ function photoGridClass(photos) {
 // ─────────────────────────────────────────────
 
 function processData(raw) {
+  const useSeverityScale = raw.useSeverityScale !== false;
+
   // ── Defects ──────────────────────────────────
   const defects = (raw.defects || []).map((d, i) => {
     const sev     = SEV[d.severity] || SEV.minor;
@@ -87,7 +89,6 @@ function processData(raw) {
       photos,
       gridClass: photoGridClass(photos),
       hasPhotos: true, // always true now — placeholders fill gaps
-      useSeverityScale: d.useSeverityScale !== false, // default true
     };
   });
 
@@ -141,6 +142,7 @@ function processData(raw) {
   return {
     // ── pass-through raw fields ──
     ...raw,
+    useSeverityScale,
 
     // ── derived display fields ──
     companyInitials:   initials(raw.companyName),
@@ -159,7 +161,7 @@ function processData(raw) {
 
     // ── new fields ──
     sewerSystemPhotos: (raw.sewerSystemPhotos || []).filter(p => p && p.url && p.url.trim()),
-    recExtraSections:  raw.recExtraSections || [],
+    statementOfServiceExtraSections: raw.statementOfServiceExtraSections || [],
     inspectorPhotoUrl: raw.inspectorPhotoUrl || '',
 
     // ── flags ──

@@ -1225,19 +1225,19 @@
       flex-shrink: 0;
     }
 
-    /* ══ REC EXTRA SECTIONS (like Narratives) ════════════════════════ */
-    .rec-extra-section {
+    /* ══ STATEMENT OF SERVICE EXTRA SECTIONS ════════════════════════ */
+    .statement-extra-section {
       margin-top: 18px;
       padding-top: 14px;
       border-top: 1px solid var(--color-border);
     }
-    .rec-extra-section h3 {
+    .statement-extra-section h3 {
       font-size: 10pt;
       font-weight: 800;
       color: var(--color-body-text);
       margin-bottom: 8px;
     }
-    .rec-extra-section .rec-extra-body {
+    .statement-extra-section .statement-extra-body {
       font-size: 9.5pt;
       line-height: 1.7;
       color: var(--color-body-text);
@@ -2021,7 +2021,7 @@
             <div class="defect">
               <div class="defect-hd">
                 <div class="defect-stripe stripe-<%= d.severityCss %>"></div>
-                <div class="defect-banner banner-<%= d.useSeverityScale !== false ? d.severityCss : 'default' %>">
+                <div class="defect-banner banner-<%= useSeverityScale !== false ? d.severityCss : 'default' %>">
                   <div>
                     <div class="defect-num">D<%= d.num %></div>
                     <div class="defect-ttl">
@@ -2033,7 +2033,7 @@
                         <%= d.feet %> ft
                       </span></div>
                   </div>
-                  <% if (d.useSeverityScale !== false) { %>
+                  <% if (useSeverityScale !== false) { %>
                   <div class="defect-badge badge-<%= d.severityCss %>">
                     <span class="defect-badge-icon">
                       <%= d.severityIcon %>
@@ -2139,16 +2139,6 @@
                       </div>
                       <div class="notes"><%- additionalNotes %></div>
                       <% } %>
-
-                    <%# Extra narrative sections (like Narratives page 3) %>
-                    <% if (recExtraSections && recExtraSections.length > 0) { %>
-                      <% recExtraSections.forEach(function(sec) { %>
-                        <div class="rec-extra-section">
-                          <h3><%= sec.heading %></h3>
-                          <div class="rec-extra-body"><%- sec.body.split('\n').map(function(p){ return p.trim() ? '<p style="margin-bottom:8px;">'+p+'</p>' : ''; }).join('') %></div>
-                        </div>
-                      <% }); %>
-                    <% } %>
             </div>
 
             <footer class="pf">
@@ -2208,6 +2198,14 @@
               </div>
               <div class="legal-text"><%- statementOfService.split('\n').map(function(p){ return p.trim() ? '<p>'
                   +p+'</p>' : '' }).join('') %></div>
+              <% if (statementOfServiceExtraSections && statementOfServiceExtraSections.length > 0) { %>
+                <% statementOfServiceExtraSections.forEach(function(sec) { %>
+                  <div class="statement-extra-section">
+                    <h3><%= sec.heading %></h3>
+                    <div class="statement-extra-body"><%- sec.body.split('\n').map(function(p){ return p.trim() ? '<p style="margin-bottom:8px;">'+p+'</p>' : ''; }).join('') %></div>
+                  </div>
+                <% }); %>
+              <% } %>
             </div>
 
             <footer class="pf">

@@ -107,8 +107,8 @@ input[type=color] {
 
 /* Add buttons */
 .btn-add {
-  width: 100%; padding: 7px; background: #0D2137;
-  border: 1px dashed #1A2E40; color: #1AAFB4;
+  width: 100%; padding: 7px; background: #f43804;
+  border: 1px dashed #1A2E40; color: #ffffff;
   font-size: 8pt; font-weight: 700; border-radius: 4px;
   cursor: pointer; letter-spacing: .04em; margin-top: 4px;
 }
@@ -276,6 +276,10 @@ Branch: Kitchen lateral</textarea>
 
       <div class="ctrl-section">
         <div class="ctrl-section-title">Defect Findings <span style="color:#5A7A8A;font-weight:400;">(each gets its own full page)</span></div>
+        <div class="checkbox-row" style="margin-bottom:8px;">
+          <input type="checkbox" id="useSeverityScale" checked>
+          <label for="useSeverityScale">Use severity scale for all defect findings</label>
+        </div>
         <div id="defect-list"></div>
         <button class="btn-add" id="btn-add-defect">+ Add Defect</button>
       </div>
@@ -289,13 +293,6 @@ Branch: Kitchen lateral</textarea>
       <div class="ctrl-section">
         <div class="ctrl-section-title">Additional Notes</div>
         <textarea id="additionalNotes" placeholder="Any additional notes for the client..."></textarea>
-      </div>
-
-      <div class="ctrl-section">
-        <div class="ctrl-section-title">Extra Narrative Sections <span style="color:#5A7A8A;font-weight:400;">(appended after Recommendations)</span></div>
-        <div style="font-size:7pt;color:#5A7A8A;margin-bottom:8px;">Add custom sections like Narratives, just as in page 3. Each gets a heading and body text.</div>
-        <div id="rec-extra-list"></div>
-        <button class="btn-add" id="btn-add-rec-extra">+ Add Section</button>
       </div>
 
     </div>
@@ -341,6 +338,9 @@ Branch: Kitchen lateral</textarea>
 This report is for the exclusive use of our client and is not intended for any other purpose. The report is based on the information available to us at the time as described in the report. Should additional information become available at a later date, we reserve the right to determine the impact, if any, the new information may have on our discovery and recommendations and to revise our opinions and conclusions if necessary and warranted.
 
 We recommend all areas we locate in this report showing anomalies should be evaluated further to find out the cause and be repaired. Our recommendations are not intended as criticisms of the structure, but rather as professional opinions regarding conditions that we observed at the time of our inspection.</textarea>
+        <div style="font-size:7pt;color:#5A7A8A;margin:8px 0;">Add custom Statement of Service sections like the Narratives section on page 3. Each gets a heading and body text.</div>
+        <div id="statement-service-extra-list"></div>
+        <button class="btn-add" id="btn-add-statement-service-extra">+ Add Section</button>
       </div>
 
       <div class="ctrl-section">
@@ -452,10 +452,15 @@ function photoGridClass(photos) {
 }
 
 function processData(raw) {
+  const useSeverityScale = raw.useSeverityScale !== undefined
+    ? raw.useSeverityScale !== false
+    : (raw.defects || []).every(d => d.useSeverityScale !== false);
+
   const defects = (raw.defects || []).map((d, i) => {
     const sev    = SEV[d.severity] || SEV.minor;
     const photos = resolvePhotos(d.photos);
-    return { ...d, ...sev, num: pad(i + 1), photos, gridClass: photoGridClass(photos), hasPhotos: true, useSeverityScale: d.useSeverityScale !== false };
+    const { useSeverityScale: _legacyUseSeverityScale, ...defect } = d;
+    return { ...defect, ...sev, num: pad(i + 1), photos, gridClass: photoGridClass(photos), hasPhotos: true };
   });
 
   const observations = (raw.observations || []).map(o => {
@@ -493,6 +498,7 @@ function processData(raw) {
 
   return {
     ...raw,
+    useSeverityScale,
     companyInitials:   initials(raw.companyName),
     fullAddress:       [raw.propertyAddress, raw.propertyCity].filter(Boolean).join(', '),
     pipeTypesDisplay:  (raw.pipeTypes || []).join(', '),
@@ -505,7 +511,7 @@ function processData(raw) {
     inspectorCredentials,
     inspectorExperience,
     sewerSystemPhotos: (raw.sewerSystemPhotos || []).filter(p => p && p.url && p.url.trim()),
-    recExtraSections:  raw.recExtraSections || [],
+    statementOfServiceExtraSections: raw.statementOfServiceExtraSections || raw.recExtraSections || [],
     inspectorPhotoUrl: raw.inspectorPhotoUrl || '',
     hasDefects:         defects.length > 0,
     hasObservations,
@@ -559,10 +565,6 @@ function addDefect(data = {}) {
     <input type="text" class="d-feet" value="${data.feet || ''}">
     <label>Narrative</label>
     <textarea class="d-narrative" style="min-height:60px;">${data.narrative || ''}</textarea>
-    <div class="checkbox-row" style="margin-top:6px;">
-      <input type="checkbox" class="d-use-sev" ${data.useSeverityScale !== false ? 'checked' : ''} style="width:14px;height:14px;accent-color:#1AAFB4;flex-shrink:0;">
-      <label style="margin:0;font-size:7.5pt;color:#C8D8E4;">Use severity scale (uncheck for grey/informational banner)</label>
-    </div>
     <label>Photos (URLs — blank = placeholder)</label>
     <div class="photo-inputs">
       ${(data.photos || ['','']).map((url, pi) => `
@@ -593,21 +595,21 @@ function addSewerPhoto(data = {}) {
   document.getElementById('sewer-photos-list').appendChild(el);
 }
 
-function addRecExtra(data = {}) {
+function addStatementServiceExtra(data = {}) {
   const el = document.createElement('div');
   el.className = 'rec-row';
   el.style.cssText = 'flex-direction:column;gap:4px;background:#0F2030;border:1px solid #1A2E40;border-radius:5px;padding:8px;margin-bottom:6px;';
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:7.5pt;font-weight:700;color:#C8D8E4;">Extra Section</span>
+      <span style="font-size:7.5pt;font-weight:700;color:#C8D8E4;">Statement Section</span>
       <button class="btn-rm-rec" onclick="this.closest('.rec-row').remove()">✕</button>
     </div>
     <label style="margin-top:4px;">Section Heading</label>
-    <input type="text" class="re-heading" value="${data.heading || ''}" placeholder="Narratives">
+    <input type="text" class="sos-heading" value="${data.heading || ''}" placeholder="Narratives">
     <label>Body Text</label>
-    <textarea class="re-body" style="min-height:70px;">${data.body || ''}</textarea>
+    <textarea class="sos-body" style="min-height:70px;">${data.body || ''}</textarea>
   `;
-  document.getElementById('rec-extra-list').appendChild(el);
+  document.getElementById('statement-service-extra-list').appendChild(el);
 }
 
 function addPhotoRow(btn) {
@@ -689,7 +691,6 @@ function collectFormData() {
     feet:      card.querySelector('.d-feet').value,
     narrative: card.querySelector('.d-narrative').value,
     photos:    [...card.querySelectorAll('.d-photo')].map(i => i.value),
-    useSeverityScale: card.querySelector('.d-use-sev') ? card.querySelector('.d-use-sev').checked : true,
   }));
 
   const observations = [...document.querySelectorAll('.obs-card')].map(card => ({
@@ -760,11 +761,12 @@ function collectFormData() {
     // arrays
     observations,
     defects,
+    useSeverityScale: checked('useSeverityScale') !== false,
     recommendations,
     additionalNotes: v('additionalNotes'),
-    recExtraSections: [...document.querySelectorAll('#rec-extra-list .rec-row')].map(row => ({
-      heading: row.querySelector('.re-heading').value,
-      body:    row.querySelector('.re-body').value,
+    statementOfServiceExtraSections: [...document.querySelectorAll('#statement-service-extra-list .rec-row')].map(row => ({
+      heading: row.querySelector('.sos-heading').value,
+      body:    row.querySelector('.sos-body').value,
     })).filter(s => s.heading || s.body),
     // toggles
     showMaterialsPage:   checked('showMaterialsPage'),
@@ -905,7 +907,7 @@ document.getElementById('btn-add-obs').addEventListener('click', () => addObserv
 document.getElementById('btn-add-video').addEventListener('click', () => addVideoLink());
 document.getElementById('btn-add-rec').addEventListener('click', () => addRec());
 document.getElementById('btn-add-sewer-photo').addEventListener('click', () => addSewerPhoto());
-document.getElementById('btn-add-rec-extra').addEventListener('click', () => addRecExtra());
+document.getElementById('btn-add-statement-service-extra').addEventListener('click', () => addStatementServiceExtra());
 
 document.getElementById('showDefectsGraphic').addEventListener('change', function() {
   document.getElementById('graphic-url-wrap').style.display = this.checked ? 'block' : 'none';
