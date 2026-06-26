@@ -189,7 +189,7 @@ input[type=color] {
         <div class="ctrl-section-title">Company</div>
         <label>Company Name</label><input type="text" id="companyName" value="LV Sewer Inspections">
         <label>Tagline</label><input type="text" id="companyTagline" value="See What's Beneath the Surface.">
-        <label>Logo URL (blank = initials badge)</label><input type="url" id="companyLogoUrl" placeholder="https://...">
+        <label>Logo URL (blank = initials badge)</label><input type="url" id="companyLogoUrl" value="https://bitzealth.com/assets/logo.svg" placeholder="https://...">
         <label>Phone</label><input type="tel" id="companyPhone" value="(702) 277-2566">
         <label>Website</label><input type="text" id="companyWebsite" value="www.LVSewerInspections.com">
       </div>
@@ -198,7 +198,7 @@ input[type=color] {
         <div class="ctrl-section-title">Inspector</div>
         <label>Inspector Name</label><input type="text" id="inspectorName" value="Marcus R. Delgado">
         <label>License / Credential</label><input type="text" id="inspectorLicense" value="License #NV-SI-20891">
-        <label>Inspector Photo URL (blank = placeholder)</label><input type="url" id="inspectorPhotoUrl" placeholder="https://...">
+        <label>Inspector Photo URL (blank = placeholder)</label><input type="url" id="inspectorPhotoUrl" value="https://bitzealth.com/assets/logo.svg" placeholder="https://...">
       </div>
 
     </div>
@@ -219,8 +219,8 @@ input[type=color] {
         <label>Client Name</label><input type="text" id="clientName" value="Jennifer &amp; Thomas Harlow">
         <label>Street Address</label><input type="text" id="propertyAddress" value="123 Main St">
         <label>City / State / ZIP</label><input type="text" id="propertyCity" value="Las Vegas, NV 89991">
-        <label>Property Photo URL (blank = placeholder)</label><input type="url" id="propertyPhotoUrl" placeholder="https://...">
-        <label>Property Photo Label</label><input type="text" id="propertyPhotoLabel" value="Front Elevation">
+        <label>Property Photo URL (blank = placeholder)</label><input type="url" id="propertyPhotoUrl" value="https://images.pexels.com/photos/783745/pexels-photo-783745.jpeg?cs=srgb&dl=pexels-foteros-783745.jpg&fm=jpg" placeholder="https://...">
+        <label>Property Photo Label</label><input type="text" id="propertyPhotoLabel" value="Site Image">
         <label>Buyer's Agent</label><input type="text" id="buyersAgent" value="Sarah K. Nguyen, Premier Realty">
         <label>Building Occupied</label><input type="text" id="buildingOccupied" value="Yes">
         <label>Weather / Soil Conditions</label><input type="text" id="weatherConditions" value="Clear / Dry Soil">
@@ -589,7 +589,7 @@ function addSewerPhoto(data = {}) {
     </div>
     <label style="margin-top:4px;">Photo URL</label>
     <input type="url" class="sp-url" value="${data.url || ''}" placeholder="https://...">
-    <label>Caption (e.g. Front Elevation, Cleanout Location)</label>
+    <label>Caption (e.g. Site Image, Cleanout Location)</label>
     <input type="text" class="sp-caption" value="${data.caption || ''}" placeholder="Cleanout Location">
   `;
   document.getElementById('sewer-photos-list').appendChild(el);
@@ -917,34 +917,119 @@ document.getElementById('showDefectsGraphic').addEventListener('change', functio
 // SEED DEFAULT DATA
 // ═══════════════════════════════════════════════════════════════
 
-addDefect({
-  title: 'Root Intrusion — Fine Hairline', severity: 'minor',
-  time: '0:42', feet: '12',
-  narrative: 'At approximately 0 min: 42 sec / 12 ft, fine hairline root intrusion was observed entering through the bell joint. The intrusion does not currently restrict hydraulic flow.',
-  photos: ['', '', ''],
-});
-addDefect({
-  title: 'Offset Joint — Physical Lip', severity: 'moderate',
-  time: '2:15', feet: '38',
-  narrative: 'At approximately 2 min: 15 sec / 38 ft, a measurable offset joint was identified creating a physical lip on the invert. Scheduled repair is recommended.',
-  photos: ['', ''],
-});
-addDefect({
-  title: 'Fractured Pipe Wall — Structural Failure', severity: 'major',
-  time: '3:58', feet: '61',
-  narrative: 'At approximately 3 min: 58 sec / 61 ft, a circumferential fracture spanning 270° was observed. Structural integrity is critically compromised. Immediate intervention required.',
-  photos: ['', '', ''],
-});
+// Clear any existing seeded data first
+document.getElementById('defect-list').innerHTML = '';
+document.getElementById('obs-list').innerHTML = '';
+document.getElementById('rec-list').innerHTML = '';
+document.getElementById('video-links-list').innerHTML = '';
+document.getElementById('sewer-photos-list').innerHTML = '';
 
-addVideoLink({ label: 'Main Line Full Run', url: 'https://youtu.be/EXAMPLE' });
+// Add realistic defects (10 total — includes 'none' severity entries)
+const seedDefects = [
+    { 
+        title: "No Defect — Cleanout Access & Pipe Material Identification", 
+        severity: "none", 
+        time: "0:12", 
+        feet: "4", 
+        narrative: "At approximately 12 seconds / 4 feet, the cleanout was successfully accessed at the rear of the property. Pipe material identified as 3\" ABS (Acrylonitrile Butadiene Styrene). No visible defects, blockages, or obstructions present. Clear flow observed with proper hydraulic grade. This establishes a baseline condition for the system at the point of entry.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "No Defect — Clear Transition Joint", 
+        severity: "none", 
+        time: "0:38", 
+        feet: "16", 
+        narrative: "At approximately 38 seconds / 16 feet, a standard transition joint between ABS and Cast Iron sections was observed. Joint is properly aligned with no displacement, gaps, or leakage. Smooth transition with no lip or obstruction. Flow direction confirmed as downstream from cleanout toward municipal main.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Light Tuberculation — Cast Iron Surface Oxidation", 
+        severity: "minor", 
+        time: "0:28", 
+        feet: "11", 
+        narrative: "At approximately 28 seconds / 11 feet, light tuberculation and surface oxidation were observed on the cast iron pipe walls. Approximately 15-20% reduction in interior diameter due to scale buildup. Flow remains unobstructed but surface friction has increased. This is typical age-related wear for cast iron systems and should be monitored during future inspections.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Fine Hairline Root Intrusion — Early Stage", 
+        severity: "minor", 
+        time: "1:03", 
+        feet: "27", 
+        narrative: "At approximately 1 minute 3 seconds / 27 feet, fine hairline root intrusion was observed entering through the bell joint. Roots measure less than 1mm in diameter with no massing or obstruction present. No visible joint displacement or cracking. This represents early-stage root infiltration common in properties with mature landscaping. Immediate repair not required, but monitoring and possible preventive treatment recommended.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Offset Joint — Physical Lip with Debris Accumulation", 
+        severity: "moderate", 
+        time: "1:42", 
+        feet: "41", 
+        narrative: "At approximately 1 minute 42 seconds / 41 feet, a measurable offset joint was identified creating a physical lip on the invert. Vertical displacement measures approximately 1/4 inch. Debris accumulation noted at the lip, creating a catch point for solids. This condition reduces hydraulic efficiency and increases the likelihood of future blockages. Professional evaluation and scheduled repair or lining recommended.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Pipe Sag — Standing Water with Sediment Accumulation", 
+        severity: "moderate", 
+        time: "2:18", 
+        feet: "56", 
+        narrative: "At approximately 2 minutes 18 seconds / 56 feet, a pronounced belly (sag) was observed spanning approximately 6 linear feet. Standing water present at 1/4 inch depth with visible sediment settling along the invert. This low point creates a trap for debris and solids, potentially leading to blockage over time. While flow is currently maintained, this condition is likely to worsen as sediment continues to accumulate.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Moderate Root Mass — Partial Obstruction", 
+        severity: "moderate", 
+        time: "2:35", 
+        feet: "64", 
+        narrative: "At approximately 2 minutes 35 seconds / 64 feet, a moderate root mass was observed occupying approximately 35-40% of the pipe diameter. Multiple roots have entered through a joint, trapping debris and creating a partial obstruction. Reduced flow capacity noted at this location. Professional root cutting and chemical treatment recommended to restore proper flow.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Severe Root Mass Obstruction — Critical Blockage", 
+        severity: "major", 
+        time: "2:55", 
+        feet: "72", 
+        narrative: "At approximately 2 minutes 55 seconds / 72 feet, a severe root mass obstruction was identified. The root mass occupies approximately 65-70% of the pipe diameter with multiple large roots entering through a compromised joint. Significant debris and sediment trapped behind the root mass. Flow is severely restricted, creating a high risk of complete blockage and potential sewage backup. The pipe joint has been displaced by root growth pressure. Immediate professional intervention required.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Longitudinal Fracture — Structural Failure with Soil Intrusion", 
+        severity: "major", 
+        time: "3:34", 
+        feet: "89", 
+        narrative: "At approximately 3 minutes 34 seconds / 89 feet, a longitudinal fracture was identified in the pipe body. The crack spans approximately 18 inches in length and measures 3/8 inch in width. Visible soil intrusion confirms the pipe wall has completely failed. This condition compromises structural integrity and poses an immediate risk of collapse or soil erosion beneath the property. Urgent excavation and pipe replacement required.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    },
+    { 
+        title: "Heavy Grease and FOG Accumulation — Reduced Flow Capacity", 
+        severity: "maintenance", 
+        time: "4:05", 
+        feet: "104", 
+        narrative: "At approximately 4 minutes 5 seconds / 104 feet, heavy grease and FOG (Fats, Oils, Grease) accumulation was identified throughout the pipe walls. The buildup reduces the pipe's effective diameter by approximately 40-50%, creating a sticky surface that traps debris. Strong odor detected at this location. Regular hydro-jetting maintenance is needed to prevent complete blockage and restore flow capacity.", 
+        photos: ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800", "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800"] 
+    }
+];
 
-addRec('Immediate excavation and pipe replacement required at the 61 ft fracture within 48 hours.');
-addRec('Schedule professional hydro-jetting within 30–60 days to clear FOG buildup.');
-addRec('Re-inspect root intrusion at 12 ft in 12 months.');
+seedDefects.forEach(def => addDefect(def));
+
+// Add recommendations
+addRec('Immediate excavation and pipe replacement required at the 89 ft fracture within 48 hours.');
+addRec('Emergency root cutting and chemical treatment required for severe root mass at 72 ft.');
+addRec('Schedule professional hydro-jetting within 30 days to clear FOG and scale buildup.');
+addRec('Re-inspect root intrusion at 27 ft in 12 months to monitor progression.');
+addRec('Consider pipe lining or trenchless repair for offset joint at 41 ft to prevent future blockages.');
+addRec('Professional descaling recommended for cast iron tuberculation at 11 ft.');
+addRec('Regular maintenance schedule recommended every 12-18 months for this property.');
+
+// Add video link
+addVideoLink({ label: 'Main Line Full Run Inspection', url: 'https://youtu.be/EXAMPLE' });
+
+// Add sewer system photos
+addSewerPhoto({ url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800', caption: 'Site Image — Rear of Property' });
+addSewerPhoto({ url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800', caption: 'Cleanout Location — Rear of Home' });
+addSewerPhoto({ url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800', caption: 'Cleanout Access Point with 3" ABS Pipe' });
 
 // Auto-render on load
 window.addEventListener('load', () => {
-  setTimeout(renderPreview, 300);
+    setTimeout(renderPreview, 300);
 });
 </script>
 </body>
