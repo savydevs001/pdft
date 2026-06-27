@@ -5,7 +5,7 @@ const fs        = require('fs');
 const path      = require('path');
 const ejs       = require('ejs');
 const puppeteer = require('puppeteer');
-
+const os        = require('os');
 const app = express();
 app.use(express.json({ limit: '20mb' }));
 app.use(express.static(__dirname)); // serves report.ejs, preview.html, assets
@@ -205,6 +205,54 @@ app.post('/api/process-data', (req, res) => {
   }
 });
 
+
+
+
+// Cross-platform Chromium executable path detection
+function getChromiumPath() {
+    const platform = os.platform();
+    
+    switch (platform) {
+        case 'win32':
+            // Windows - try common installation paths
+            const possiblePaths = [
+                'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+                'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+                'C:\\Program Files\\Chromium\\Application\\chrome.exe',
+                'C:\\Program Files (x86)\\Chromium\\Application\\chrome.exe'
+            ];
+            for (const p of possiblePaths) {
+                if (require('fs').existsSync(p)) return p;
+            }
+            return null; // Fallback to bundled Chromium
+        case 'darwin':
+            // macOS
+            return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+        case 'linux':
+            // Linux - try common paths
+            const linuxPaths = [
+                '/usr/bin/chromium-browser',
+                '/usr/bin/chromium',
+                '/usr/bin/google-chrome',
+                '/usr/bin/google-chrome-stable',
+                '/snap/bin/chromium'
+            ];
+            for (const p of linuxPaths) {
+                if (require('fs').existsSync(p)) return p;
+            }
+            return null;
+        default:
+            return null;
+    }
+}
+
+
+
+
+
+
+
+
 // ─────────────────────────────────────────────
 // PDF GENERATION
 // ─────────────────────────────────────────────
@@ -225,7 +273,29 @@ app.post('/api/generate-report', async (req, res) => {
     const templatePath = path.join(__dirname, 'report.ejs');
     const html = await ejs.renderFile(templatePath, data, { rmWhitespace: false });
 
-    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+ // When launching Puppeteer:
+const CHROMIUM_PATH = getChromiumPath();
+
+// Launch browser with fallback
+const launchOptions = {
+    args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu'
+    ],
+    headless: 'new'
+};
+
+// Only set executablePath if we found a system browser
+if (CHROMIUM_PATH) {
+    launchOptions.executablePath = CHROMIUM_PATH;
+    console.log(`Using system Chromium: ${CHROMIUM_PATH}`);
+} else {
+    console.log('Using bundled Chromium from Puppeteer');
+}
+
+const browser = await puppeteer.launch(launchOptions);
     const page    = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     const pdf = await page.pdf({
