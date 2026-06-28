@@ -1,2296 +1,641 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <title>
-    <%= reportNumber %> — <%= fullAddress %>
-  </title>
+  <title><%= reportNumber %> — <%= fullAddress %></title>
   <style>
     :root {
-      /* ── Theme (injected at render time) ── */
       <%=__themeCSS %>
-      /* ── Body palette ── */
       --color-page-bg: #FFFFFF;
       --color-body-text: #1C2B3A;
       --color-muted: #5A6A7A;
       --color-border: #D8E3EC;
       --color-row-alt: #F4F8FB;
-
-      /* ── Severity ── */
-      --sev-none-clr: #2D7A4F;
-      --sev-none-bg: #EAF7EF;
-      --sev-minor-clr: #B58A00;
-      --sev-minor-bg: #FEFAE8;
-      --sev-mod-clr: #C0520A;
-      --sev-mod-bg: #FEF3EA;
-      --sev-major-clr: #B91C1C;
-      --sev-major-bg: #FEF0F0;
-      --sev-maint-clr: #1D4ED8;
-      --sev-maint-bg: #EEF3FF;
-
-      /* ── Typography ── */
+      --sev-none-clr: #2D7A4F;  --sev-none-bg: #EAF7EF;
+      --sev-minor-clr: #B58A00; --sev-minor-bg: #FEFAE8;
+      --sev-mod-clr: #C0520A;   --sev-mod-bg: #FEF3EA;
+      --sev-major-clr: #B91C1C; --sev-major-bg: #FEF0F0;
+      --sev-maint-clr: #1D4ED8; --sev-maint-bg: #EEF3FF;
       --font: 'Arial', 'Helvetica Neue', sans-serif;
-
-      /* ── Page — US Letter ── */
-      --page-w: 8.5in;
-      --page-h: 11in;
-      --ph: 0.60in;
-      /* horizontal padding */
-      --pv: 0.50in;
-      /* vertical padding */
+      --page-w: 8.5in; --page-h: 11in; --ph: 0.60in; --pv: 0.50in;
     }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: var(--font);
-      font-size: 9.5pt;
-      color: var(--color-body-text);
-      background: #8C9BA8;
-      line-height: 1.55;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); font-size: 9.5pt; color: var(--color-body-text); background: #8C9BA8; line-height: 1.55; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
     /* ══ PAGE SHELL ══════════════════════════════════════════════════ */
-    .page {
-      width: var(--page-w);
-      min-height: var(--page-h);
-      background: var(--color-page-bg);
-      margin: 20px auto;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 4px 32px rgba(0, 0, 0, .28);
-      page-break-after: always;
-    }
-
-    @media print {
-      body {
-        background: none;
-      }
-
-      .page {
-        margin: 0;
-        box-shadow: none;
-        page-break-after: always;
-      }
-    }
+    .page { width: var(--page-w); min-height: var(--page-h); background: var(--color-page-bg); margin: 20px auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 32px rgba(0,0,0,.28); page-break-after: always; }
+    @media print { body { background: none; } .page { margin: 0; box-shadow: none; page-break-after: always; } }
 
     /* ══ SHARED HEADER ═══════════════════════════════════════════════ */
-    .ph {
-      background: var(--color-header-bg);
-      color: var(--color-header-text);
-      padding: 10px var(--ph);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .ph-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 7px;
-      background: var(--color-logo-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 13px;
-      color: #fff;
-      letter-spacing: -.5px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .logo-badge img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .ph-divider {
-      width: 1px;
-      height: 30px;
-      background: rgba(255, 255, 255, .22);
-    }
-
-    .ph-name h1 {
-      font-size: 11pt;
-      font-weight: 800;
-      letter-spacing: .01em;
-    }
-
-    .ph-name p {
-      font-size: 7pt;
-      opacity: .72;
-      margin-top: 1px;
-    }
-
-    .ph-meta {
-      text-align: right;
-    }
-
-    .ph-meta-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      justify-content: flex-end;
-    }
-
-    .ph-meta-lbl {
-      font-size: 6.5pt;
-      opacity: .62;
-      font-weight: 800;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-
-    .ph-meta-val {
-      font-size: 8pt;
-      font-weight: 700;
-    }
-
-    .accent-bar {
-      height: 3px;
-      background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark));
-      flex-shrink: 0;
-    }
+    .ph { background: var(--color-header-bg); color: var(--color-header-text); padding: 10px var(--ph); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .ph-logo { display: flex; align-items: center; gap: 10px; }
+    .logo-badge { width: 38px; height: 38px; border-radius: 7px; background: var(--color-logo-bg); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; color: #fff; letter-spacing: -.5px; flex-shrink: 0; overflow: hidden; }
+    .logo-badge img { width: 100%; height: 100%; object-fit: cover; }
+    .ph-divider { width: 1px; height: 30px; background: rgba(255,255,255,.22); }
+    .ph-name h1 { font-size: 11pt; font-weight: 800; letter-spacing: .01em; }
+    .ph-name p { font-size: 7pt; opacity: .72; margin-top: 1px; }
+    .ph-meta { text-align: right; }
+    .ph-meta-row { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .ph-meta-lbl { font-size: 6.5pt; opacity: .62; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .ph-meta-val { font-size: 8pt; font-weight: 700; }
+    .accent-bar { height: 3px; background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark)); flex-shrink: 0; }
 
     /* ══ PAGE CONTENT WRAPPER ════════════════════════════════════════ */
-    .pc {
-      flex: 1;
-      padding: var(--pv) var(--ph);
-      overflow: hidden;
-    }
+    .pc { flex: 1; padding: var(--pv) var(--ph); overflow: hidden; }
 
     /* ══ SECTION HEADING ═════════════════════════════════════════════ */
-    .sh {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
+    .sh { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .sh-bar { width: 4px; height: 22px; background: var(--color-accent); border-radius: 2px; flex-shrink: 0; }
+    .sh h2 { font-size: 12.5pt; font-weight: 800; color: var(--color-body-text); flex: 1; }
+    .sh-num { font-size: 7pt; font-weight: 700; color: var(--color-accent); letter-spacing: .10em; text-transform: uppercase; }
 
-    .sh-bar {
-      width: 4px;
-      height: 22px;
-      background: var(--color-accent);
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-
-    .sh h2 {
-      font-size: 12.5pt;
-      font-weight: 800;
-      color: var(--color-body-text);
-      flex: 1;
-    }
-
-    .sh-num {
-      font-size: 7pt;
-      font-weight: 700;
-      color: var(--color-accent);
-      letter-spacing: .10em;
-      text-transform: uppercase;
-    }
-
-    /* ══ SHARED FOOTER (all pages) ═══════════════════════════════════ */
-    .pf {
-      margin-top: auto;
-      border-top: 1px solid var(--color-border);
-      padding: 7px var(--ph) 8px;
-      flex-shrink: 0;
-      background: var(--color-page-bg);
-    }
-
-    .pf-top {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 4px;
-    }
-
-    .pf-co {
-      font-size: 7.5pt;
-      font-weight: 800;
-      letter-spacing: .07em;
-      text-transform: uppercase;
-      color: var(--color-body-text);
-    }
-
-    .pf-pg {
-      font-size: 7pt;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-    }
-
-    .pf-pg strong {
-      color: var(--color-body-text);
-    }
-
-    .pf-leg {
-      font-size: 6pt;
-      color: var(--color-muted);
-      line-height: 1.6;
-    }
-
-    .pf-leg strong {
-      font-weight: 700;
-      color: var(--color-body-text);
-    }
-
-    .pf-copy {
-      font-size: 6pt;
-      color: var(--color-muted);
-      margin-top: 2px;
-    }
+    /* ══ SHARED FOOTER ═══════════════════════════════════════════════ */
+    .pf { margin-top: auto; border-top: 1px solid var(--color-border); padding: 7px var(--ph) 8px; flex-shrink: 0; background: var(--color-page-bg); }
+    .pf-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+    .pf-co { font-size: 7.5pt; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--color-body-text); }
+    .pf-pg { font-size: 7pt; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
+    .pf-pg strong { color: var(--color-body-text); }
+    .pf-leg { font-size: 6pt; color: var(--color-muted); line-height: 1.6; }
+    .pf-leg strong { font-weight: 700; color: var(--color-body-text); }
+    .pf-copy { font-size: 6pt; color: var(--color-muted); margin-top: 2px; }
 
     /* ══ INFO TABLE ══════════════════════════════════════════════════ */
-    .info-tbl {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 8px;
-    }
+    .info-tbl { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+    .info-tbl tr:nth-child(even) td { background: var(--color-row-alt); }
+    .info-tbl td { padding: 6px 10px; vertical-align: top; }
+    .info-tbl td.lbl { width: 34%; font-size: 7.5pt; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; color: var(--color-body-text); white-space: nowrap; }
+    .info-tbl td.val { font-size: 9pt; color: var(--color-body-text); }
+    .sec-rule { border: none; border-top: 1px solid var(--color-border); margin: 18px 0; }
 
-    .info-tbl tr:nth-child(even) td {
-      background: var(--color-row-alt);
-    }
+    /* ══ PIPE TAGS & VIDEO LINKS ═════════════════════════════════════ */
+    .pipe-tag { display: inline-block; padding: 2px 9px; background: var(--color-accent); color: #fff; font-size: 7.5pt; font-weight: 700; border-radius: 3px; margin: 2px 3px 2px 0; letter-spacing: .04em; }
+    .video-link { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--color-row-alt); border: 1px solid var(--color-border); border-radius: 4px; color: var(--color-accent); font-size: 8pt; font-weight: 600; text-decoration: none; margin: 2px 4px 2px 0; }
+    .video-link::before { content: '▶'; font-size: 7pt; }
 
-    .info-tbl td {
-      padding: 6px 10px;
-      vertical-align: top;
-    }
-
-    .info-tbl td.lbl {
-      width: 34%;
-      font-size: 7.5pt;
-      font-weight: 900;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      color: var(--color-body-text);
-      white-space: nowrap;
-    }
-
-    .info-tbl td.val {
-      font-size: 9pt;
-      color: var(--color-body-text);
-    }
-
-    .sec-rule {
-      border: none;
-      border-top: 1px solid var(--color-border);
-      margin: 18px 0;
-    }
-
-    /* ══ PIPE TAGS ═══════════════════════════════════════════════════ */
-    .pipe-tag {
-      display: inline-block;
-      padding: 2px 9px;
-      background: var(--color-accent);
-      color: #fff;
-      font-size: 7.5pt;
-      font-weight: 700;
-      border-radius: 3px;
-      margin: 2px 3px 2px 0;
-      letter-spacing: .04em;
-    }
-
-    /* ══ VIDEO LINKS ═════════════════════════════════════════════════ */
-    .video-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      background: var(--color-row-alt);
-      border: 1px solid var(--color-border);
-      border-radius: 4px;
-      color: var(--color-accent);
-      font-size: 8pt;
-      font-weight: 600;
-      text-decoration: none;
-      margin: 2px 4px 2px 0;
-    }
-
-    .video-link::before {
-      content: '▶';
-      font-size: 7pt;
-    }
-
-    /* ══ TOC ═════════════════════════════════════════════════════════ */
-    .toc-list {
-      list-style: none;
-    }
-
-    .toc-grp {
-      font-size: 6.5pt;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--color-accent);
-      margin: 14px 0 5px;
-    }
-
-    .toc-item {
-      display: flex;
-      align-items: baseline;
-      gap: 0;
-      padding: 5px 0;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .toc-lbl {
-      font-size: 9.5pt;
-      font-weight: 800;
-      color: var(--color-body-text);
-      white-space: nowrap;
-    }
-
-    .toc-dots {
-      flex: 1;
-      border-bottom: 2px dotted var(--color-border);
-      margin: 0 8px;
-      position: relative;
-      top: -3px;
-    }
-
-    .toc-pg {
-      font-size: 9pt;
-      font-weight: 700;
-      color: var(--color-body-text);
-      white-space: nowrap;
-    }
+    /* ══ TABLE OF CONTENTS ═══════════════════════════════════════════ */
+    .toc-list { list-style: none; }
+    .toc-grp { font-size: 6.5pt; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin: 14px 0 5px; }
+    .toc-item { display: flex; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--color-border); }
+    .toc-lbl { font-size: 9.5pt; font-weight: 800; color: var(--color-body-text); white-space: nowrap; }
+    .toc-dots { flex: 1; border-bottom: 2px dotted var(--color-border); margin: 0 8px; position: relative; top: -3px; }
+    .toc-pg { font-size: 9pt; font-weight: 700; color: var(--color-body-text); white-space: nowrap; }
 
     /* ══ SEVERITY SCALE ══════════════════════════════════════════════ */
-    .sev-block {
-      display: flex;
-      gap: 12px;
-      border-left: 4px solid;
-      padding: 10px 12px;
-      border-radius: 0 5px 5px 0;
-      margin-bottom: 10px;
-    }
-
-    .sev-block.sev-none {
-      border-color: var(--sev-none-clr);
-      background: var(--sev-none-bg);
-    }
-
-    .sev-block.sev-minor {
-      border-color: var(--sev-minor-clr);
-      background: var(--sev-minor-bg);
-    }
-
-    .sev-block.sev-mod {
-      border-color: var(--sev-mod-clr);
-      background: var(--sev-mod-bg);
-    }
-
-    .sev-block.sev-major {
-      border-color: var(--sev-major-clr);
-      background: var(--sev-major-bg);
-    }
-
-    .sev-block.sev-maint {
-      border-color: var(--sev-maint-clr);
-      background: var(--sev-maint-bg);
-    }
-
-    .sev-icon {
-      font-size: 18pt;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    .sev-title {
-      font-size: 10pt;
-      font-weight: 800;
-    }
-
-    .sev-sub {
-      font-size: 7.5pt;
-      opacity: .7;
-      margin-bottom: 4px;
-    }
-
-    .sev-body {
-      font-size: 8.5pt;
-    }
-
-    .sev-eg {
-      margin-top: 4px;
-      font-style: italic;
-      font-size: 7.5pt;
-      opacity: .75;
-    }
+    .sev-block { display: flex; gap: 12px; border-left: 4px solid; padding: 10px 12px; border-radius: 0 5px 5px 0; margin-bottom: 10px; }
+    .sev-block.sev-none  { border-color: var(--sev-none-clr);  background: var(--sev-none-bg);  }
+    .sev-block.sev-minor { border-color: var(--sev-minor-clr); background: var(--sev-minor-bg); }
+    .sev-block.sev-mod   { border-color: var(--sev-mod-clr);   background: var(--sev-mod-bg);   }
+    .sev-block.sev-major { border-color: var(--sev-major-clr); background: var(--sev-major-bg); }
+    .sev-block.sev-maint { border-color: var(--sev-maint-clr); background: var(--sev-maint-bg); }
+    .sev-icon { font-size: 18pt; flex-shrink: 0; line-height: 1; }
+    .sev-title { font-size: 10pt; font-weight: 800; }
+    .sev-sub { font-size: 7.5pt; opacity: .7; margin-bottom: 4px; }
+    .sev-body { font-size: 8.5pt; }
+    .sev-eg { margin-top: 4px; font-style: italic; font-size: 7.5pt; opacity: .75; }
 
     /* ══ DEFECT PAGE ═════════════════════════════════════════════════ */
-    .defect {
-      border: 1px solid var(--color-border);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .defect-hd {
-      display: flex;
-    }
-
-    .defect-stripe {
-      width: 6px;
-      flex-shrink: 0;
-    }
-
-    .defect-stripe.stripe-none {
-      background: var(--sev-none-clr);
-    }
-
-    .defect-stripe.stripe-minor {
-      background: var(--sev-minor-clr);
-    }
-
-    .defect-stripe.stripe-mod {
-      background: var(--sev-mod-clr);
-    }
-
-    .defect-stripe.stripe-major {
-      background: var(--sev-major-clr);
-    }
-
-    .defect-stripe.stripe-maint {
-      background: var(--sev-maint-clr);
-    }
-
-    .defect-num {
-      font-size: 7pt;
-      font-weight: 700;
-      letter-spacing: .10em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-    }
-
-    .defect-ttl {
-      font-size: 13pt;
-      font-weight: 800;
-      color: var(--color-body-text);
-      margin: 3px 0;
-    }
-
-    .defect-loc {
-      font-size: 8pt;
-      color: var(--color-muted);
-    }
-
-    .defect-loc span {
-      font-weight: 700;
-      color: var(--color-body-text);
-    }
-
-    .defect-badge {
-      text-align: center;
-      font-size: 8pt;
-      font-weight: 700;
-      padding: 8px 12px;
-      border-radius: 5px;
-      flex-shrink: 0;
-      line-height: 1.4;
-      white-space: nowrap;
-    }
-
-    .defect-badge-icon {
-      display: block;
-      font-size: 16pt;
-      margin-bottom: 2px;
-    }
-
-    .badge-none {
-      color: var(--sev-none-clr);
-      background: var(--sev-none-bg);
-    }
-
-    .badge-minor {
-      color: var(--sev-minor-clr);
-      background: var(--sev-minor-bg);
-    }
-
-    .badge-mod {
-      color: var(--sev-mod-clr);
-      background: var(--sev-mod-bg);
-    }
-
-    .badge-major {
-      color: var(--sev-major-clr);
-      background: var(--sev-major-bg);
-    }
-
-    .badge-maint {
-      color: var(--sev-maint-clr);
-      background: var(--sev-maint-bg);
-    }
-
-    .defect-body {
-      padding: 14px;
-      font-size: 9.5pt;
-      line-height: 1.6;
-    }
-
-    /* ══ PHOTO GRID ══════════════════════════════════════════════════ */
-    .photo-grid {
-      display: grid;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .photo-grid.cols-1 {
-      grid-template-columns: 1fr;
-    }
-
-    .photo-grid.cols-2 {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .photo-grid.cols-3 {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    .photo-cell {
-      position: relative;
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid var(--color-border);
-    }
-
-    .photo-cell img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .photo-grid.cols-1 .photo-cell img {
-      height: 200px;
-    }
-
-    .photo-num {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(13, 33, 55, .62);
-      color: #fff;
-      font-size: 6.5pt;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-align: center;
-      padding: 3px 0;
-    }
-
-    /* ══ RECOMMENDATIONS ═════════════════════════════════════════════ */
-    .rec-list {
-      list-style: none;
-    }
-
-    .rec-item {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--color-border);
-      font-size: 9.5pt;
-    }
-
-    .rec-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--color-accent);
-      color: #fff;
-      font-size: 8pt;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .notes {
-      font-size: 9.5pt;
-      line-height: 1.7;
-      color: var(--color-body-text);
-    }
-
-    /* ══ STATEMENT OF SERVICE ════════════════════════════════════════ */
-    .legal-text {
-      font-size: 9pt;
-      line-height: 1.75;
-      color: var(--color-body-text);
-    }
-
-    .legal-text p {
-      margin-bottom: 12px;
-    }
-
-    .legal-text p:last-child {
-      margin-bottom: 0;
-    }
-
-    /* ══ PIPE MATERIALS TABLE ════════════════════════════════════════ */
-    .mat-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .mat-table thead td {
-      background: var(--color-header-bg);
-      color: var(--color-header-text);
-      font-size: 8pt;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      padding: 8px 14px;
-    }
-
-    .mat-table tbody tr:nth-child(even) {
-      background: var(--color-row-alt);
-    }
-
-    .mat-table tbody td {
-      padding: 6px 14px;
-      font-size: 9pt;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .mat-table tbody td:last-child {
-      font-weight: 700;
-      text-align: right;
-      color: var(--color-accent);
-    }
-
-    .mat-note {
-      margin-top: 14px;
-      padding: 10px 14px;
-      background: var(--color-row-alt);
-      border-left: 4px solid var(--color-accent);
-      border-radius: 0 4px 4px 0;
-      font-size: 8.5pt;
-      line-height: 1.6;
-    }
-
-    .mat-note strong {
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    /* ══ DEFECTS GRAPHIC PAGE ════════════════════════════════════════ */
-    .graphic-wrap {
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .graphic-wrap img {
-      width: 100%;
-      border-radius: 5px;
-      border: 1px solid var(--color-border);
-    }
-
-    /* ══ INSPECTOR BIO ════════════════════════════════════════════════ */
-    .bio-headline {
-      font-size: 9.5pt;
-      line-height: 1.7;
-      margin-bottom: 14px;
-    }
-
-    .bio-section {
-      margin-bottom: 16px;
-    }
-
-    .bio-section h3 {
-      font-size: 9pt;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--color-muted);
-      margin-bottom: 7px;
-    }
-
-    .bio-list {
-      list-style: none;
-    }
-
-    .bio-list li {
-      padding: 4px 0 4px 14px;
-      font-size: 9pt;
-      line-height: 1.5;
-      border-bottom: 1px solid var(--color-border);
-      position: relative;
-    }
-
-    .bio-list li::before {
-      content: '—';
-      position: absolute;
-      left: 0;
-      color: var(--color-accent);
-      font-weight: 700;
-    }
-
-    .bio-footer {
-      margin-top: 20px;
-      text-align: center;
-      padding-top: 16px;
-      border-top: 2px solid var(--color-accent);
-    }
-
-    .bio-footer .biz-name {
-      font-size: 14pt;
-      font-weight: 800;
-    }
-
-    .bio-footer .biz-tagline {
-      font-size: 9pt;
-      color: var(--color-muted);
-      margin: 4px 0 8px;
-    }
-
-    .bio-footer .biz-contact {
-      font-size: 11pt;
-      font-weight: 700;
-      color: var(--color-accent);
-    }
-
-    .bio-footer .biz-web {
-      font-size: 9pt;
-      color: var(--color-muted);
-      text-decoration: underline;
-    }
-
-
-    /* ══ COVER PAGE ══════════════════════════════════════════════════ */
-
-    /* Dedicated cover header — bigger than shared .ph */
-    .cover-ph {
-      background: var(--color-header-bg);
-      color: var(--color-header-text);
-      padding: 30px var(--ph);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .cover-ph-logo {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .cover-ph-badge {
-      width: 76px;
-      height: 76px;
-      border-radius: 12px;
-      background: var(--color-logo-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 26px;
-      color: #fff;
-      letter-spacing: -.5px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .cover-ph-badge img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .cover-ph-divider {
-      width: 1px;
-      height: 60px;
-      background: rgba(255, 255, 255, .22);
-    }
-
-    .cover-ph-name h1 {
-      font-size: 22pt;
-      font-weight: 900;
-      letter-spacing: .02em;
-      line-height: 1.1;
-    }
-
-    .cover-ph-name p {
-      font-size: 11pt;
-      opacity: .80;
-      margin-top: 4px;
-    }
-
-    .cover-ph-meta {
-      text-align: right;
-    }
-
-    .cover-ph-meta-group {
-      margin-bottom: 8px;
-    }
-
-    .cover-ph-meta-group:last-child {
-      margin-bottom: 0;
-    }
-
-    .cover-ph-lbl {
-      display: block;
-      font-size: 8pt;
-      opacity: .70;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-
-    .cover-ph-val {
-      display: block;
-      font-size: 12pt;
-      font-weight: 800;
-      letter-spacing: .05em;
-    }
-
-    /* Photo card — tall, inset, rounded with shadow */
-    .cover-photo-card {
-      margin: 16px var(--ph) 0;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #D8E4EE;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, .16);
-      position: relative;
-      flex-shrink: 0;
-      height: 6.4in;
-      background: #1C2B3A;
-    }
-
-    .cover-photo-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .cover-photo-label {
-      position: absolute;
-      bottom: 16px;
-      left: 16px;
-      background: rgba(13, 33, 55, .82);
-      color: #fff;
-      font-size: 7pt;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border-radius: 6px;
-    }
-
-    /* Timeline — pure CSS, no SVG, no gradients */
-    .cover-timeline {
-      display: flex;
-      align-items: center;
-      padding: 16px var(--ph) 0;
-      gap: 0;
-      flex-shrink: 0;
-    }
-
-    .cover-tl-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--color-accent);
-      flex-shrink: 0;
-      border: 3px solid #fff;
-      box-shadow: 0 0 0 1px var(--color-accent);
-      position: relative;
-      z-index: 2;
-    }
-
-    .cover-tl-line {
-      flex: 1;
-      height: 2px;
-      background: var(--color-accent);
-      position: relative;
-      opacity: 0.6;
-      margin: 0 -2px;
-      z-index: 1;
-    }
-
-    .cover-tl-line::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: -4px;
-      height: 10px;
-      background: repeating-linear-gradient(90deg, var(--color-accent) 0, var(--color-accent) 1px, transparent 1px, transparent 12.5%);
-    }
-
-    .cover-tl-arrow {
-      color: var(--color-accent);
-      font-size: 14px;
-      flex-shrink: 0;
-      line-height: 1;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Address block */
-    .cover-address {
-      padding: 16px var(--ph) 0;
-      flex-shrink: 0;
-    }
-
-    .cover-eyebrow {
-      font-size: 8pt;
-      font-weight: 800;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      color: var(--color-accent);
-      margin-bottom: 6px;
-    }
-
-    .cover-street {
-      font-size: 38pt;
-      font-weight: 800;
-      line-height: 1.1;
-      color: var(--color-body-text);
-      letter-spacing: -.02em;
-    }
-
-    .cover-city {
-      font-size: 20pt;
-      font-weight: 500;
-      line-height: 1.2;
-      color: var(--color-muted);
-      margin-top: 2px;
-    }
-
-    /* Meta strip */
-    .cover-meta-strip {
-      padding: 12px var(--ph) 0;
-      font-size: 8.5pt;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .cover-meta-strip .dot {
-      color: var(--color-accent);
-      font-size: 9pt;
-      line-height: 1;
-    }
-
-
-
-    /* ══ PROPERTY PHOTO ON CLIENT PAGE ════════════════════════════════ */
-    .client-layout {
-      display: grid;
-      grid-template-columns: 1fr 200px;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .client-photo {
-      border-radius: 5px;
-      overflow: hidden;
-      border: 1px solid var(--color-border);
-    }
-
-    .client-photo img {
-      width: 100%;
-      height: 130px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .client-photo-label {
-      font-size: 6.5pt;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-align: center;
-      padding: 4px;
-      background: var(--color-row-alt);
-      color: var(--color-muted);
-    }
-
-    /* ══ SEWER SYSTEM PHOTO GRID ══════════════════════════════════════ */
-    .sewer-photo-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .sewer-photo-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-    .sewer-photo-cell {
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid var(--color-border);
-      position: relative;
-    }
-    .sewer-photo-cell img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      display: block;
-    }
-    .sewer-photo-caption {
-      font-size: 6.5pt;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-align: center;
-      padding: 4px;
-      background: var(--color-row-alt);
-      color: var(--color-muted);
-      text-transform: uppercase;
-    }
-
-    /* ══ DEFECT / DISCOVERY BANNER — full color ══════════════════════ */
-    .defect-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
-      flex: 1;
-    }
-    .defect-banner.banner-none  { background: var(--sev-none-bg);  border-left: none; }
-    .defect-banner.banner-minor { background: var(--sev-minor-bg); }
-    .defect-banner.banner-mod   { background: var(--sev-mod-bg);   }
-    .defect-banner.banner-major { background: var(--sev-major-bg); }
-    .defect-banner.banner-maint { background: var(--sev-maint-bg); }
-    /* default/no-severity grey */
+    .defect { border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; }
+    .defect-hd { display: flex; }
+    .defect-stripe { width: 6px; flex-shrink: 0; }
+    .defect-stripe.stripe-none  { background: var(--sev-none-clr);  }
+    .defect-stripe.stripe-minor { background: var(--sev-minor-clr); }
+    .defect-stripe.stripe-mod   { background: var(--sev-mod-clr);   }
+    .defect-stripe.stripe-major { background: var(--sev-major-clr); }
+    .defect-stripe.stripe-maint { background: var(--sev-maint-clr); }
+    .defect-num { font-size: 7pt; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: var(--color-muted); }
+    .defect-ttl { font-size: 13pt; font-weight: 800; color: var(--color-body-text); margin: 3px 0; }
+    .defect-loc { font-size: 8pt; color: var(--color-muted); }
+    .defect-loc span { font-weight: 700; color: var(--color-body-text); }
+    .defect-badge { text-align: center; font-size: 8pt; font-weight: 700; padding: 8px 12px; border-radius: 5px; flex-shrink: 0; line-height: 1.4; white-space: nowrap; }
+    .defect-badge-icon { display: block; font-size: 16pt; margin-bottom: 2px; }
+    .badge-none  { color: var(--sev-none-clr);  background: var(--sev-none-bg);  }
+    .badge-minor { color: var(--sev-minor-clr); background: var(--sev-minor-bg); }
+    .badge-mod   { color: var(--sev-mod-clr);   background: var(--sev-mod-bg);   }
+    .badge-major { color: var(--sev-major-clr); background: var(--sev-major-bg); }
+    .badge-maint { color: var(--sev-maint-clr); background: var(--sev-maint-bg); }
+    .defect-body { padding: 14px; font-size: 9.5pt; line-height: 1.6; }
+
+    /* ══ DEFECT BANNER ═══════════════════════════════════════════════ */
+    .defect-banner { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; flex: 1; }
+    .defect-banner.banner-none    { background: var(--sev-none-bg);  }
+    .defect-banner.banner-minor   { background: var(--sev-minor-bg); }
+    .defect-banner.banner-mod     { background: var(--sev-mod-bg);   }
+    .defect-banner.banner-major   { background: var(--sev-major-bg); }
+    .defect-banner.banner-maint   { background: var(--sev-maint-bg); }
     .defect-banner.banner-default { background: #EAEEF2; }
-
-    .defect-banner .defect-num {
-      font-size: 7pt;
-      font-weight: 800;
-      letter-spacing: .10em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      margin-bottom: 2px;
-    }
-    .defect-banner .defect-ttl {
-      font-size: 12pt;
-      font-weight: 800;
-      color: var(--color-body-text);
-      margin: 2px 0;
-    }
-    .defect-banner .defect-loc {
-      font-size: 7.5pt;
-      color: var(--color-muted);
-    }
+    .defect-banner .defect-num  { font-size: 7pt; font-weight: 800; letter-spacing: .10em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 2px; }
+    .defect-banner .defect-ttl  { font-size: 12pt; font-weight: 800; color: var(--color-body-text); margin: 2px 0; }
+    .defect-banner .defect-loc  { font-size: 7.5pt; color: var(--color-muted); }
     .defect-banner .defect-loc span { font-weight: 700; color: var(--color-body-text); }
 
-    /* ══ RECOMMENDATIONS — symbol bullets ════════════════════════════ */
-    .rec-symbol {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--color-accent);
-      color: #fff;
-      font-size: 12pt;
-      line-height: 24px;
-      text-align: center;
-      flex-shrink: 0;
-    }
+    /* ══ PHOTO GRID ══════════════════════════════════════════════════ */
+    .photo-grid { display: grid; gap: 8px; margin-top: 14px; }
+    .photo-grid.cols-1 { grid-template-columns: 1fr; }
+    .photo-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+    .photo-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .photo-cell { position: relative; border-radius: 4px; overflow: hidden; border: 1px solid var(--color-border); }
+    .photo-cell img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .photo-num { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(13,33,55,.62); color: #fff; font-size: 6.5pt; font-weight: 700; letter-spacing: .08em; text-align: center; padding: 3px 0; }
+
+    /* ══ RECOMMENDATIONS ═════════════════════════════════════════════ */
+    .rec-list { list-style: none; }
+    .rec-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--color-border); font-size: 9.5pt; }
+    .rec-symbol { width: 24px; height: 24px; border-radius: 50%; background: var(--color-accent); color: #fff; font-size: 12pt; line-height: 24px; text-align: center; flex-shrink: 0; }
+    .notes { font-size: 9.5pt; line-height: 1.7; color: var(--color-body-text); }
+
+    /* ══ LEGAL TEXT ══════════════════════════════════════════════════ */
+    .legal-text { font-size: 9pt; line-height: 1.75; color: var(--color-body-text); }
+    .legal-text p { margin-bottom: 12px; }
+    .legal-text p:last-child { margin-bottom: 0; }
 
     /* ══ STATEMENT OF SERVICE EXTRA SECTIONS ════════════════════════ */
-    .statement-extra-section {
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid var(--color-border);
-    }
-    .statement-extra-section h3 {
-      font-size: 10pt;
-      font-weight: 800;
-      color: var(--color-body-text);
-      margin-bottom: 8px;
-    }
-    .statement-extra-section .statement-extra-body {
-      font-size: 9.5pt;
-      line-height: 1.7;
-      color: var(--color-body-text);
-    }
+    .statement-extra-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--color-border); }
+    .statement-extra-section h3 { font-size: 10pt; font-weight: 800; color: var(--color-body-text); margin-bottom: 8px; }
+    .statement-extra-section .statement-extra-body { font-size: 9.5pt; line-height: 1.7; color: var(--color-body-text); }
 
-    /* ══ INSPECTOR PHOTO ══════════════════════════════════════════════ */
-    .bio-layout {
-      display: grid;
-      grid-template-columns: 1fr 160px;
-      gap: 18px;
-      align-items: start;
-    }
-    .inspector-photo {
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--color-border);
-    }
-    .inspector-photo img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      display: block;
-    }
-    .inspector-photo-label {
-      font-size: 6.5pt;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-align: center;
-      padding: 4px;
-      background: var(--color-row-alt);
-      color: var(--color-muted);
-      text-transform: uppercase;
-    }
+    /* ══ PIPE MATERIALS TABLE ════════════════════════════════════════ */
+    .mat-table { width: 100%; border-collapse: collapse; }
+    .mat-table thead td { background: var(--color-header-bg); color: var(--color-header-text); font-size: 8pt; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 8px 14px; }
+    .mat-table tbody tr:nth-child(even) { background: var(--color-row-alt); }
+    .mat-table tbody td { padding: 6px 14px; font-size: 9pt; border-bottom: 1px solid var(--color-border); }
+    .mat-table tbody td:last-child { font-weight: 700; text-align: right; color: var(--color-accent); }
+    .mat-note { margin-top: 14px; padding: 10px 14px; background: var(--color-row-alt); border-left: 4px solid var(--color-accent); border-radius: 0 4px 4px 0; font-size: 8.5pt; line-height: 1.6; }
+    .mat-note strong { display: block; margin-bottom: 4px; }
+
+    /* ══ DEFECTS GRAPHIC ═════════════════════════════════════════════ */
+    .graphic-wrap { width: 100%; margin-top: 10px; }
+    .graphic-wrap img { width: 100%; border-radius: 5px; border: 1px solid var(--color-border); }
+
+    /* ══ INSPECTOR BIO ════════════════════════════════════════════════ */
+    .bio-layout { display: grid; grid-template-columns: 1fr 160px; gap: 18px; align-items: start; }
+    .bio-headline { font-size: 9.5pt; line-height: 1.7; margin-bottom: 14px; }
+    .bio-section { margin-bottom: 16px; }
+    .bio-section h3 { font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--color-muted); margin-bottom: 7px; }
+    .bio-list { list-style: none; }
+    .bio-list li { padding: 4px 0 4px 14px; font-size: 9pt; line-height: 1.5; border-bottom: 1px solid var(--color-border); position: relative; }
+    .bio-list li::before { content: '—'; position: absolute; left: 0; color: var(--color-accent); font-weight: 700; }
+    .bio-footer { margin-top: 20px; text-align: center; padding-top: 16px; border-top: 2px solid var(--color-accent); }
+    .bio-footer .biz-name { font-size: 14pt; font-weight: 800; }
+    .bio-footer .biz-tagline { font-size: 9pt; color: var(--color-muted); margin: 4px 0 8px; }
+    .bio-footer .biz-contact { font-size: 11pt; font-weight: 700; color: var(--color-accent); }
+    .bio-footer .biz-web { font-size: 9pt; color: var(--color-muted); text-decoration: underline; }
+    .inspector-photo { border-radius: 6px; overflow: hidden; border: 1px solid var(--color-border); }
+    .inspector-photo img { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .inspector-photo-label { font-size: 6.5pt; font-weight: 700; letter-spacing: .06em; text-align: center; padding: 4px; background: var(--color-row-alt); color: var(--color-muted); text-transform: uppercase; }
+
+    /* ══ COVER PAGE ══════════════════════════════════════════════════ */
+    .cover-ph { background: var(--color-header-bg); color: var(--color-header-text); padding: 30px var(--ph); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .cover-ph-logo { display: flex; align-items: center; gap: 20px; }
+    .cover-ph-badge { width: 76px; height: 76px; border-radius: 12px; background: var(--color-logo-bg); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 26px; color: #fff; letter-spacing: -.5px; flex-shrink: 0; overflow: hidden; }
+    .cover-ph-badge img { width: 100%; height: 100%; object-fit: cover; }
+    .cover-ph-divider { width: 1px; height: 60px; background: rgba(255,255,255,.22); }
+    .cover-ph-name h1 { font-size: 22pt; font-weight: 900; letter-spacing: .02em; line-height: 1.1; }
+    .cover-ph-name p { font-size: 11pt; opacity: .80; margin-top: 4px; }
+    .cover-ph-meta { text-align: right; }
+    .cover-ph-meta-group { margin-bottom: 8px; }
+    .cover-ph-meta-group:last-child { margin-bottom: 0; }
+    .cover-ph-lbl { display: block; font-size: 8pt; opacity: .70; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 2px; }
+    .cover-ph-val { display: block; font-size: 12pt; font-weight: 800; letter-spacing: .05em; }
+    .cover-photo-card { margin: 16px var(--ph) 0; border-radius: 12px; overflow: hidden; border: 1px solid #D8E4EE; box-shadow: 0 4px 20px rgba(0,0,0,.16); position: relative; flex-shrink: 0; height: 6.4in; background: #1C2B3A; }
+    .cover-photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cover-photo-label { position: absolute; bottom: 16px; left: 16px; background: rgba(13,33,55,.82); color: #fff; font-size: 7pt; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; padding: 6px 14px; border-radius: 6px; }
+    .cover-timeline { display: flex; align-items: center; padding: 16px var(--ph) 0; flex-shrink: 0; }
+    .cover-tl-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; border: 3px solid #fff; box-shadow: 0 0 0 1px var(--color-accent); position: relative; z-index: 2; }
+    .cover-tl-line { flex: 1; height: 2px; background: var(--color-accent); opacity: 0.6; margin: 0 -2px; z-index: 1; position: relative; }
+    .cover-tl-line::after { content: ''; position: absolute; left: 0; right: 0; top: -4px; height: 10px; background: repeating-linear-gradient(90deg, var(--color-accent) 0, var(--color-accent) 1px, transparent 1px, transparent 12.5%); }
+    .cover-tl-arrow { color: var(--color-accent); font-size: 14px; flex-shrink: 0; line-height: 1; position: relative; z-index: 2; }
+    .cover-address { padding: 16px var(--ph) 0; flex-shrink: 0; }
+    .cover-eyebrow { font-size: 8pt; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent); margin-bottom: 6px; }
+    .cover-street { font-size: 38pt; font-weight: 800; line-height: 1.1; color: var(--color-body-text); letter-spacing: -.02em; }
+    .cover-city { font-size: 20pt; font-weight: 500; line-height: 1.2; color: var(--color-muted); margin-top: 2px; }
+    .cover-meta-strip { padding: 12px var(--ph) 0; font-size: 8.5pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .cover-meta-strip .dot { color: var(--color-accent); font-size: 9pt; line-height: 1; }
+
+    /* ══ CLIENT PAGE EXTRAS ═══════════════════════════════════════════ */
+    .client-layout { display: grid; grid-template-columns: 1fr 200px; gap: 16px; align-items: start; }
+    .client-photo { border-radius: 5px; overflow: hidden; border: 1px solid var(--color-border); }
+    .client-photo img { width: 100%; height: 130px; object-fit: cover; display: block; }
+    .client-photo-label { font-size: 6.5pt; font-weight: 700; letter-spacing: .06em; text-align: center; padding: 4px; background: var(--color-row-alt); color: var(--color-muted); }
+    .sewer-photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .sewer-photo-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .sewer-photo-cell { border-radius: 4px; overflow: hidden; border: 1px solid var(--color-border); }
+    .sewer-photo-cell img { width: 100%; height: 140px; object-fit: cover; display: block; }
+    .sewer-photo-caption { font-size: 6.5pt; font-weight: 700; letter-spacing: .06em; text-align: center; padding: 4px; background: var(--color-row-alt); color: var(--color-muted); text-transform: uppercase; }
   </style>
 </head>
-
 <body>
 
+<%
+/* ── Reusable partials ────────────────────────────────────────────── */
+var _badge = companyLogoUrl
+  ? '<img src="' + companyLogoUrl + '" alt="">'
+  : companyInitials;
 
-  <!-- ════════════════════════════════════════════════════════
-     PAGE 1 — COVER
+var _ph = '<header class="ph"><div class="ph-logo">'
+  + '<div class="logo-badge">' + _badge + '</div>'
+  + '<div class="ph-divider"></div>'
+  + '<div class="ph-name"><h1>' + companyName + '</h1><p>' + companyTagline + '</p></div>'
+  + '</div><div class="ph-meta">'
+  + '<div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">' + reportNumber + '</span></div>'
+  + '<div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">' + inspectionDate + '</span></div>'
+  + '</div></header><div class="accent-bar"></div>';
+
+var _legalText = footerLegal || 'Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report is for the sole use of the named client. <strong>Not to be used for the purpose of substitute disclosure.</strong>';
+var _copyText  = '&copy; ' + new Date().getFullYear() + ' ' + companyName + '. All rights reserved.';
+
+function _pf(pgNum) {
+  return '<footer class="pf">'
+    + '<div class="pf-top"><span class="pf-co">' + companyName + '</span>'
+    + '<span class="pf-pg">PAGE <strong>' + pgNum + '</strong></span></div>'
+    + '<div class="pf-leg">' + _legalText + '</div>'
+    + '<div class="pf-copy">' + _copyText + '</div>'
+    + '</footer>';
+}
+%>
+
+
+<!-- ════════════════════════════════════════════════════════
+   PAGE 1 — COVER
 ════════════════════════════════════════════════════════ -->
-  <div class="page page-cover">
-    <%# Dedicated BIGGER cover header — NOT .ph so it doesn't inherit small sizing %>
-      <header class="cover-ph">
-        <div class="cover-ph-logo">
-          <div class="cover-ph-badge">
-            <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-              <% } else { %>
-                <%= companyInitials %>
-                  <% } %>
-          </div>
-          <div class="cover-ph-divider"></div>
-          <div class="cover-ph-name">
-            <h1>
-              <%= companyName %>
-            </h1>
-            <p>
-              <%= companyTagline %>
-            </p>
-          </div>
-        </div>
-        <div class="cover-ph-meta">
-          <div class="cover-ph-meta-group"><span class="cover-ph-lbl">Report No.</span><span class="cover-ph-val">
-              <%= reportNumber %>
-            </span></div>
-          <div class="cover-ph-meta-group"><span class="cover-ph-lbl">Inspected</span><span class="cover-ph-val">
-              <%= inspectionDate %>
-            </span></div>
-        </div>
-      </header>
-      <div class="accent-bar"></div>
-
-      <div class="cover-photo-card">
-        <img
-          src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/1400x900/1C2B3A/5A6A7A?text=Property+Photo' %>"
-          alt="Property Photo">
-        <div class="cover-photo-label">
-          <%= propertyPhotoLabel || 'Site Image' %>
-        </div>
+<div class="page page-cover">
+  <header class="cover-ph">
+    <div class="cover-ph-logo">
+      <div class="cover-ph-badge"><%= companyLogoUrl ? '' : '' %>
+        <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt=""><% } else { %><%= companyInitials %><% } %>
       </div>
-
-      <div class="cover-timeline">
-        <div class="cover-tl-dot"></div>
-        <div class="cover-tl-line"></div>
-        <div class="cover-tl-arrow">▶</div>
-      </div>
-
-      <div class="cover-address">
-        <div class="cover-eyebrow">Sewer Scope Inspection Report</div>
-        <div class="cover-street">
-          <%= propertyAddress %>
-        </div>
-        <div class="cover-city">
-          <%= propertyCity %>
-        </div>
-      </div>
-
-      <div class="cover-meta-strip">
-        <span>Inspected <%= inspectionDate %></span>
-        <span class="dot">•</span>
-        <span>
-          <%= inspectionTime %>
-        </span>
-        <span class="dot">•</span>
-        <span>Report <%= reportNumber %></span>
-      </div>
-
-      <footer class="pf">
-        <div class="pf-top">
-          <span class="pf-co">
-            <%= companyName %>
-          </span>
-          <span class="pf-pg">PAGE <strong>01</strong></span>
-        </div>
-        <div class="pf-leg">
-          Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report
-          is for the sole use of the named client.
-          <strong>Not to be used for the purpose of substitute disclosure.</strong>
-        </div>
-        <div class="pf-copy">© <%= new Date().getFullYear() %>
-            <%= companyName %>. All rights reserved.</div>
-      </footer>
-  </div>
-
-
-  <!-- ════════════════════════════════════════════════════════
-     PAGE 2 — TABLE OF CONTENTS
-════════════════════════════════════════════════════════ -->
-  <div class="page">
-    <header class="ph">
-      <div class="ph-logo">
-        <div class="logo-badge">
-          <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-            <% } else { %>
-              <%= companyInitials %>
-                <% } %>
-        </div>
-        <div class="ph-divider"></div>
-        <div class="ph-name">
-          <h1>
-            <%= companyName %>
-          </h1>
-          <p>
-            <%= companyTagline %>
-          </p>
-        </div>
-      </div>
-      <div class="ph-meta">
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-            <%= reportNumber %>
-          </span></div>
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-            <%= inspectionDate %>
-          </span></div>
-      </div>
-    </header>
-    <div class="accent-bar"></div>
-
-    <div class="pc">
-      <div class="sh">
-        <div class="sh-bar"></div>
-        <h2>Table of Contents</h2>
-      </div>
-      <ul class="toc-list">
-        <li class="toc-grp">Preamble</li>
-        <li class="toc-item"><span class="toc-lbl">Cover Page</span><span class="toc-dots"></span><span
-            class="toc-pg">01</span></li>
-        <li class="toc-item"><span class="toc-lbl">Table of Contents</span><span class="toc-dots"></span><span
-            class="toc-pg">02</span></li>
-        <li class="toc-item"><span class="toc-lbl">Disclosure, Scope &amp; Point of Reference</span><span
-            class="toc-dots"></span><span class="toc-pg">03</span></li>
-
-        <li class="toc-grp">Inspection Details</li>
-        <li class="toc-item"><span class="toc-lbl">Client &amp; Site Information</span><span
-            class="toc-dots"></span><span class="toc-pg">04</span></li>
-        <li class="toc-item"><span class="toc-lbl">Defect Severity Classification</span><span
-            class="toc-dots"></span><span class="toc-pg">05</span></li>
-
-            <% if (hasDefects) { %>
-              <li class="toc-grp">Defect Findings</li>
-              <li class="toc-item">
-                <span class="toc-lbl">Defects</span>
-                <span class="toc-dots"></span>
-                <span class="toc-pg">
-                  <% if (defects.length > 1) { %>
-                    <%= defects[0].pageNum %>-<%= defects[defects.length - 1].pageNum %>
-                  <% } else { %>
-                    <%= defects[0].pageNum %>
-                  <% } %>
-                </span>
-              </li>
-            <% } %>
-
-                    <li class="toc-grp">Summary &amp; Appendix</li>
-                    <li class="toc-item"><span class="toc-lbl">Recommendations &amp; Notes</span><span
-                        class="toc-dots"></span><span class="toc-pg">
-                        <%= String(pages.recommendations).padStart(2,'0') %>
-                      </span></li>
-                    <li class="toc-item"><span class="toc-lbl">Statement of Service</span><span
-                        class="toc-dots"></span><span class="toc-pg">
-                        <%= String(pages.statementOfService).padStart(2,'0') %>
-                      </span></li>
-                    <% if (showMaterialsPage) { %>
-                      <li class="toc-item"><span class="toc-lbl">Understanding Sewer Materials &amp; Defects</span><span
-                          class="toc-dots"></span><span class="toc-pg">
-                          <%= String(pages.materials).padStart(2,'0') %>
-                        </span></li>
-                      <% } %>
-                        <% if (showDefectsGraphic) { %>
-                          <li class="toc-item"><span class="toc-lbl">Sewer Defects Graphic</span><span
-                              class="toc-dots"></span><span class="toc-pg">
-                              <%= String(pages.defectsGraphic).padStart(2,'0') %>
-                            </span></li>
-                          <% } %>
-                            <% if (showInspectorBio) { %>
-                              <li class="toc-item"><span class="toc-lbl">Meet Your Inspector</span><span
-                                  class="toc-dots"></span><span class="toc-pg">
-                                  <%= String(pages.inspectorBio).padStart(2,'0') %>
-                                </span></li>
-                              <% } %>
-      </ul>
+      <div class="cover-ph-divider"></div>
+      <div class="cover-ph-name"><h1><%= companyName %></h1><p><%= companyTagline %></p></div>
     </div>
-
-    <footer class="pf">
-      <div class="pf-top"><span class="pf-co">
-          <%= companyName %>
-        </span><span class="pf-pg">PAGE <strong>02</strong></span></div>
-      <div class="pf-leg">
-        <%= footerLegal %>
-      </div>
-    </footer>
-  </div>
-
-
-  <!-- ════════════════════════════════════════════════════════
-     PAGE 3 — DISCLOSURE + SCOPE + POINT OF REFERENCE
-════════════════════════════════════════════════════════ -->
-  <div class="page">
-    <header class="ph">
-      <div class="ph-logo">
-        <div class="logo-badge">
-          <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-            <% } else { %>
-              <%= companyInitials %>
-                <% } %>
-        </div>
-        <div class="ph-divider"></div>
-        <div class="ph-name">
-          <h1>
-            <%= companyName %>
-          </h1>
-          <p>
-            <%= companyTagline %>
-          </p>
-        </div>
-      </div>
-      <div class="ph-meta">
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-            <%= reportNumber %>
-          </span></div>
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-            <%= inspectionDate %>
-          </span></div>
-      </div>
-    </header>
-    <div class="accent-bar"></div>
-
-    <div class="pc">
-      <div class="sh">
-        <div class="sh-bar"></div>
-        <h2>Sewer Line Inspection Disclosure</h2><span class="sh-num">Section 01</span>
-      </div>
-      <div class="legal-text"><%- disclosureText.split('\n').map(function(p){ return p.trim() ? '<p>' +p+'</p>' : ''
-          }).join('') %></div>
-
-      <hr class="sec-rule">
-
-      <div class="sh">
-        <div class="sh-bar"></div>
-        <h2>Scope of the Sewer Inspection</h2>
-      </div>
-      <div class="legal-text"><%- scopeText.split('\n').map(function(p){ return p.trim() ? '<p>' +p+'</p>' : ''
-          }).join('') %></div>
-
-      <hr class="sec-rule">
-
-      <div class="sh">
-        <div class="sh-bar"></div>
-        <h2>Point of Reference</h2>
-      </div>
-      <div class="legal-text"><%- pointOfReference.split('\n').map(function(p){ return p.trim() ? '<p>' +p+'</p>' : ''
-          }).join('') %></div>
+    <div class="cover-ph-meta">
+      <div class="cover-ph-meta-group"><span class="cover-ph-lbl">Report No.</span><span class="cover-ph-val"><%= reportNumber %></span></div>
+      <div class="cover-ph-meta-group"><span class="cover-ph-lbl">Inspected</span><span class="cover-ph-val"><%= inspectionDate %></span></div>
     </div>
+  </header>
+  <div class="accent-bar"></div>
 
-    <footer class="pf">
-      <div class="pf-top"><span class="pf-co">
-          <%= companyName %>
-        </span><span class="pf-pg">PAGE <strong>03</strong></span></div>
-      <div class="pf-leg">
-        Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report
-        is for the sole use of the named client.
-        <strong>Not to be used for the purpose of substitute disclosure.</strong>
-      </div>
-      <div class="pf-copy">© <%= new Date().getFullYear() %>
-          <%= companyName %>. All rights reserved.</div>
-    </footer>
+  <div class="cover-photo-card">
+    <img src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/1400x900/1C2B3A/5A6A7A?text=Property+Photo' %>" alt="Property Photo">
+    <div class="cover-photo-label"><%= propertyPhotoLabel || 'Site Image' %></div>
   </div>
 
+  <div class="cover-timeline">
+    <div class="cover-tl-dot"></div><div class="cover-tl-line"></div><div class="cover-tl-arrow">▶</div>
+  </div>
 
-  <!-- ════════════════════════════════════════════════════════
-     PAGE 4 — CLIENT & SITE INFO + SEWER SYSTEM INFO
+  <div class="cover-address">
+    <div class="cover-eyebrow">Sewer Scope Inspection Report</div>
+    <div class="cover-street"><%= propertyAddress %></div>
+    <div class="cover-city"><%= propertyCity %></div>
+  </div>
+
+  <div class="cover-meta-strip">
+    <span>Inspected <%= inspectionDate %></span><span class="dot">•</span>
+    <span><%= inspectionTime %></span><span class="dot">•</span>
+    <span>Report <%= reportNumber %></span>
+  </div>
+
+  <%- _pf('01') %>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+   PAGE 2 — TABLE OF CONTENTS
 ════════════════════════════════════════════════════════ -->
-  <div class="page">
-    <header class="ph">
-      <div class="ph-logo">
-        <div class="logo-badge">
-          <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-            <% } else { %>
-              <%= companyInitials %>
-                <% } %>
-        </div>
-        <div class="ph-divider"></div>
-        <div class="ph-name">
-          <h1>
-            <%= companyName %>
-          </h1>
-          <p>
-            <%= companyTagline %>
-          </p>
-        </div>
-      </div>
-      <div class="ph-meta">
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-            <%= reportNumber %>
-          </span></div>
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-            <%= inspectionDate %>
-          </span></div>
-      </div>
-    </header>
-    <div class="accent-bar"></div>
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Table of Contents</h2></div>
+    <ul class="toc-list">
+      <li class="toc-grp">Preamble</li>
+      <li class="toc-item"><span class="toc-lbl">Cover Page</span><span class="toc-dots"></span><span class="toc-pg">01</span></li>
+      <li class="toc-item"><span class="toc-lbl">Table of Contents</span><span class="toc-dots"></span><span class="toc-pg">02</span></li>
+      <li class="toc-item"><span class="toc-lbl">Disclosure, Scope &amp; Point of Reference</span><span class="toc-dots"></span><span class="toc-pg">03</span></li>
 
-    <div class="pc">
-      <div class="sh">
-        <div class="sh-bar"></div>
-        <h2>Client &amp; Site Information</h2><span class="sh-num">Section 02</span>
-      </div>
-      <div class="client-layout">
-        <table class="info-tbl">
-          <tr>
-            <td class="lbl">File No.</td>
-            <td class="val">
-              <%= fileNumber %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Client Name</td>
-            <td class="val">
-              <%= clientName %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Property Address</td>
-            <td class="val">
-              <%= fullAddress %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Date of Inspection</td>
-            <td class="val">
-              <%= inspectionDate %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Time of Inspection</td>
-            <td class="val">
-              <%= inspectionTime %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Inspector</td>
-            <td class="val">
-              <%= inspectorName %> &nbsp;—&nbsp; <%= inspectorLicense %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">People Present</td>
-            <td class="val">
-              <%= peoplePresent %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Buyer's Agent</td>
-            <td class="val">
-              <%= buyersAgent %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Building Occupied</td>
-            <td class="val">
-              <%= buildingOccupied %>
-            </td>
-          </tr>
-          <tr>
-            <td class="lbl">Weather / Soil</td>
-            <td class="val">
-              <%= weatherConditions %>
-            </td>
-          </tr>
-        </table>
-        <div>
-          <div class="client-photo">
-            <img
-              src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/400x260/1C2B3A/5A6A7A?text=Property+Photo' %>"
-              alt="Property">
-            <div class="client-photo-label">
-              <%= propertyPhotoLabel || 'Site Image' %>
-            </div>
-          </div>
-        </div>
-      </div>
+      <li class="toc-grp">Inspection Details</li>
+      <li class="toc-item"><span class="toc-lbl">Client &amp; Site Information</span><span class="toc-dots"></span><span class="toc-pg">04</span></li>
+      <li class="toc-item"><span class="toc-lbl">Defect Severity Classification</span><span class="toc-dots"></span><span class="toc-pg">05</span></li>
 
-      <hr class="sec-rule">
+      <% if (hasDefects) { %>
+      <li class="toc-grp">Defect Findings</li>
+      <li class="toc-item">
+        <span class="toc-lbl">Defects</span><span class="toc-dots"></span>
+        <span class="toc-pg"><% if (defects.length > 1) { %><%= defects[0].pageNum %>–<%= defects[defects.length-1].pageNum %><% } else { %><%= defects[0].pageNum %><% } %></span>
+      </li>
+      <% } %>
 
-      <div class="sh">
-        <div class="sh-bar"></div>
-        <h2>Sewer System Information</h2><span class="sh-num">Section 03</span>
-      </div>
+      <li class="toc-grp">Summary &amp; Appendix</li>
+      <li class="toc-item"><span class="toc-lbl">Recommendations &amp; Notes</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.recommendations).padStart(2,'0') %></span></li>
+      <li class="toc-item"><span class="toc-lbl">Statement of Service</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.statementOfService).padStart(2,'0') %></span></li>
+      <% if (showMaterialsPage) { %><li class="toc-item"><span class="toc-lbl">Understanding Sewer Materials &amp; Defects</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.materials).padStart(2,'0') %></span></li><% } %>
+      <% if (showDefectsGraphic) { %><li class="toc-item"><span class="toc-lbl">Sewer Defects Graphic</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.defectsGraphic).padStart(2,'0') %></span></li><% } %>
+      <% if (showInspectorBio) { %><li class="toc-item"><span class="toc-lbl">Meet Your Inspector</span><span class="toc-dots"></span><span class="toc-pg"><%= String(pages.inspectorBio).padStart(2,'0') %></span></li><% } %>
+    </ul>
+  </div>
+  <%- _pf('02') %>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+   PAGE 3 — DISCLOSURE + SCOPE + POINT OF REFERENCE
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Sewer Line Inspection Disclosure</h2><span class="sh-num">Section 01</span></div>
+    <div class="legal-text"><%- disclosureText.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : ''; }).join('') %></div>
+
+    <hr class="sec-rule">
+
+    <div class="sh"><div class="sh-bar"></div><h2>Scope of the Sewer Inspection</h2></div>
+    <div class="legal-text"><%- scopeText.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : ''; }).join('') %></div>
+
+    <hr class="sec-rule">
+
+    <div class="sh"><div class="sh-bar"></div><h2>Point of Reference</h2></div>
+    <div class="legal-text"><%- pointOfReference.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : ''; }).join('') %></div>
+  </div>
+  <%- _pf('03') %>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+   PAGE 4 — CLIENT & SITE INFO + SEWER SYSTEM INFO
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Client &amp; Site Information</h2><span class="sh-num">Section 02</span></div>
+    <div class="client-layout">
       <table class="info-tbl">
-        <tr>
-          <td class="lbl">Camera Entry / Cleanout</td>
-          <td class="val">
-            <%= cleanoutLocation %>
-              <% if (cleanoutSize) { %> &nbsp;·&nbsp; <strong>
-                  <%= cleanoutSize %>
-                </strong>
-                <% } %>
-          </td>
-        </tr>
-        <tr>
-          <td class="lbl">Pipe Material(s)</td>
-          <td class="val">
-            <% pipeTypes.forEach(function(p) { %><span class="pipe-tag">
-                <%= p %>
-              </span>
-              <% }) %>
-          </td>
-        </tr>
-        <% if (sewerLength) { %>
-          <tr>
-            <td class="lbl">Total Run Length</td>
-            <td class="val">
-              <%= sewerLength %> ft
-            </td>
-          </tr>
-          <% } %>
-            <% if (cameraDirections) { %>
-              <tr>
-                <td class="lbl">Camera Direction(s)</td>
-                <td class="val"><%- cameraDirections.replace(/\n/g,'<br>') %></td>
-              </tr>
-              <% } %>
-                <% if (hasVideoLinks) { %>
-                  <tr>
-                    <td class="lbl">Inspection Videos</td>
-                    <td class="val">
-                      <% videoLinks.forEach(function(v) { %>
-                        <a href="<%= v.url %>" class="video-link" target="_blank">
-                          <%= v.label %>
-                        </a>
-                        <% }) %>
-                    </td>
-                  </tr>
-                  <% } %>
-                    <% if (systemNotes && systemNotes.trim()) { %>
-                      <tr>
-                        <td class="lbl">System Notes</td>
-                        <td class="val">
-                          <%= systemNotes %>
-                        </td>
-                      </tr>
-                      <% } %>
+        <tr><td class="lbl">File No.</td><td class="val"><%= fileNumber %></td></tr>
+        <tr><td class="lbl">Client Name</td><td class="val"><%= clientName %></td></tr>
+        <tr><td class="lbl">Property Address</td><td class="val"><%= fullAddress %></td></tr>
+        <tr><td class="lbl">Date of Inspection</td><td class="val"><%= inspectionDate %></td></tr>
+        <tr><td class="lbl">Time of Inspection</td><td class="val"><%= inspectionTime %></td></tr>
+        <tr><td class="lbl">Inspector</td><td class="val"><%= inspectorName %> &nbsp;—&nbsp; <%= inspectorLicense %></td></tr>
+        <tr><td class="lbl">People Present</td><td class="val"><%= peoplePresent %></td></tr>
+        <tr><td class="lbl">Buyer's Agent</td><td class="val"><%= buyersAgent %></td></tr>
+        <tr><td class="lbl">Building Occupied</td><td class="val"><%= buildingOccupied %></td></tr>
+        <tr><td class="lbl">Weather / Soil</td><td class="val"><%= weatherConditions %></td></tr>
       </table>
+      <div class="client-photo">
+        <img src="<%= propertyPhotoUrl && propertyPhotoUrl.trim() ? propertyPhotoUrl : 'https://placehold.co/400x260/1C2B3A/5A6A7A?text=Property+Photo' %>" alt="Property">
+        <div class="client-photo-label"><%= propertyPhotoLabel || 'Site Image' %></div>
+      </div>
+    </div>
 
-      <%# Sewer system / cleanout photos — 2 or 3 photos %>
-      <% var swPhotos = (sewerSystemPhotos || []).filter(function(p){ return p && p.url && p.url.trim(); }); %>
-      <% if (swPhotos.length > 0) { %>
-        <div class="sewer-photo-grid <%= swPhotos.length >= 3 ? 'cols-3' : '' %>">
-          <% swPhotos.forEach(function(sp) { %>
-            <div class="sewer-photo-cell">
-              <img src="<%= sp.url %>" alt="<%= sp.caption || 'Site Photo' %>">
-              <div class="sewer-photo-caption"><%= sp.caption || 'Site Photo' %></div>
-            </div>
+    <hr class="sec-rule">
+
+    <div class="sh"><div class="sh-bar"></div><h2>Sewer System Information</h2><span class="sh-num">Section 03</span></div>
+    <table class="info-tbl">
+      <tr>
+        <td class="lbl">Camera Entry / Cleanout</td>
+        <td class="val"><%= cleanoutLocation %><% if (cleanoutSize) { %> &nbsp;·&nbsp; <strong><%= cleanoutSize %></strong><% } %></td>
+      </tr>
+      <tr>
+        <td class="lbl">Pipe Material(s)</td>
+        <td class="val"><% pipeTypes.forEach(function(p){ %><span class="pipe-tag"><%= p %></span><% }); %></td>
+      </tr>
+      <% if (sewerLength) { %><tr><td class="lbl">Total Run Length</td><td class="val"><%= sewerLength %> ft</td></tr><% } %>
+      <% if (cameraDirections) { %><tr><td class="lbl">Camera Direction(s)</td><td class="val"><%- cameraDirections.replace(/\n/g,'<br>') %></td></tr><% } %>
+      <% if (hasVideoLinks) { %>
+      <tr>
+        <td class="lbl">Inspection Videos</td>
+        <td class="val"><% videoLinks.forEach(function(v){ %><a href="<%= v.url %>" class="video-link" target="_blank"><%= v.label %></a><% }); %></td>
+      </tr>
+      <% } %>
+      <% if (systemNotes && systemNotes.trim()) { %><tr><td class="lbl">System Notes</td><td class="val"><%= systemNotes %></td></tr><% } %>
+    </table>
+
+    <% var swPhotos = (sewerSystemPhotos || []).filter(function(p){ return p && p.url && p.url.trim(); }); %>
+    <% if (swPhotos.length > 0) { %>
+    <div class="sewer-photo-grid <%= swPhotos.length >= 3 ? 'cols-3' : '' %>">
+      <% swPhotos.forEach(function(sp){ %>
+      <div class="sewer-photo-cell">
+        <img src="<%= sp.url %>" alt="<%= sp.caption || 'Site Photo' %>">
+        <div class="sewer-photo-caption"><%= sp.caption || 'Site Photo' %></div>
+      </div>
+      <% }); %>
+    </div>
+    <% } %>
+  </div>
+  <%- _pf('04') %>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+   PAGE 5 — DEFECT SEVERITY CLASSIFICATION
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Defect Severity Classification Framework</h2><span class="sh-num">Section 04</span></div>
+    <div class="sev-block sev-none">
+      <span class="sev-icon">🟢</span>
+      <div><div class="sev-title">No Defect</div><div class="sev-sub">Informational</div><div class="sev-body"><%= sevNoneDef %><div class="sev-eg"><%= sevNoneEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-minor">
+      <span class="sev-icon">🟡</span>
+      <div><div class="sev-title">Minor Defect</div><div class="sev-sub">Monitor</div><div class="sev-body"><%= sevMinorDef %><div class="sev-eg"><%= sevMinorEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-mod">
+      <span class="sev-icon">🟠</span>
+      <div><div class="sev-title">Moderate Defect</div><div class="sev-sub">Recommended Action</div><div class="sev-body"><%= sevModDef %><div class="sev-eg"><%= sevModEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-major">
+      <span class="sev-icon">🔴</span>
+      <div><div class="sev-title">Major Defect</div><div class="sev-sub">Critical / Immediate Action</div><div class="sev-body"><%= sevMajorDef %><div class="sev-eg"><%= sevMajorEg %></div></div></div>
+    </div>
+    <div class="sev-block sev-maint">
+      <span class="sev-icon">🔵</span>
+      <div><div class="sev-title">Suggested Maintenance</div><div class="sev-sub">Preventative Care</div><div class="sev-body"><%= sevMaintDef %><div class="sev-eg"><%= sevMaintEg %></div></div></div>
+    </div>
+  </div>
+  <%- _pf('05') %>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+   PAGES 6+ — DEFECT FINDINGS (one page per defect)
+════════════════════════════════════════════════════════ -->
+<% defects.forEach(function(d) { %>
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh">
+      <div class="sh-bar"></div>
+      <h2>Sewer Pipe Conditions / Discovery</h2>
+      <span class="sh-num">Section 05 — Finding <%= d.num %> of <%= defectCount %></span>
+    </div>
+    <div class="defect">
+      <div class="defect-hd">
+        <div class="defect-stripe stripe-<%= d.severityCss %>"></div>
+        <div class="defect-banner banner-<%= useSeverityScale !== false ? d.severityCss : 'default' %>">
+          <div>
+            <div class="defect-num">D<%= d.num %></div>
+            <div class="defect-ttl"><%= d.title %></div>
+            <div class="defect-loc">At <span><%= d.time %> min</span> &nbsp;/&nbsp; <span><%= d.feet %> ft</span></div>
+          </div>
+          <% if (useSeverityScale !== false) { %>
+          <div class="defect-badge badge-<%= d.severityCss %>">
+            <span class="defect-badge-icon"><%= d.severityIcon %></span>
+            <%= d.severityLabel %><br><span style="font-weight:400;font-size:6.5pt;"><%= d.severitySub %></span>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <div class="defect-body">
+        <%- d.narrative %>
+        <div class="photo-grid <%= d.gridClass %>">
+          <% d.photos.forEach(function(url, pi){ %>
+          <div class="photo-cell">
+            <img src="<%= url %>" alt="Photo <%= pi+1 %>">
+            <span class="photo-num">PHOTO <%= pi+1 %></span>
+          </div>
           <% }); %>
         </div>
-      <% } %>
-    </div>
-
-    <footer class="pf">
-      <div class="pf-top"><span class="pf-co">
-          <%= companyName %>
-        </span><span class="pf-pg">PAGE <strong>04</strong></span></div>
-      <div class="pf-leg">
-        Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report
-        is for the sole use of the named client.
-        <strong>Not to be used for the purpose of substitute disclosure.</strong>
-      </div>
-      <div class="pf-copy">© <%= new Date().getFullYear() %>
-          <%= companyName %>. All rights reserved.</div>
-    </footer>
-  </div>
-
-
-  <!-- ════════════════════════════════════════════════════════
-     PAGE 5 — DEFECT SEVERITY CLASSIFICATION
-════════════════════════════════════════════════════════ -->
-  <div class="page">
-    <header class="ph">
-      <div class="ph-logo">
-        <div class="logo-badge">
-          <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-            <% } else { %>
-              <%= companyInitials %>
-                <% } %>
-        </div>
-        <div class="ph-divider"></div>
-        <div class="ph-name">
-          <h1>
-            <%= companyName %>
-          </h1>
-          <p>
-            <%= companyTagline %>
-          </p>
-        </div>
-      </div>
-      <div class="ph-meta">
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-            <%= reportNumber %>
-          </span></div>
-        <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-            <%= inspectionDate %>
-          </span></div>
-      </div>
-    </header>
-    <div class="accent-bar"></div>
-
-    <div class="pc">
-      <div class="sh">
-        <div class="sh-bar"></div>
-        <h2>Defect Severity Classification Framework</h2><span class="sh-num">Section 04</span>
-      </div>
-
-      <div class="sev-block sev-none">
-        <span class="sev-icon">🟢</span>
-        <div>
-          <div class="sev-title">No Defect</div>
-          <div class="sev-sub">Informational</div>
-          <div class="sev-body">
-            <%= sevNoneDef %>
-              <div class="sev-eg">
-                <%= sevNoneEg %>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="sev-block sev-minor">
-        <span class="sev-icon">🟡</span>
-        <div>
-          <div class="sev-title">Minor Defect</div>
-          <div class="sev-sub">Monitor</div>
-          <div class="sev-body">
-            <%= sevMinorDef %>
-              <div class="sev-eg">
-                <%= sevMinorEg %>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="sev-block sev-mod">
-        <span class="sev-icon">🟠</span>
-        <div>
-          <div class="sev-title">Moderate Defect</div>
-          <div class="sev-sub">Recommended Action</div>
-          <div class="sev-body">
-            <%= sevModDef %>
-              <div class="sev-eg">
-                <%= sevModEg %>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="sev-block sev-major">
-        <span class="sev-icon">🔴</span>
-        <div>
-          <div class="sev-title">Major Defect</div>
-          <div class="sev-sub">Critical / Immediate Action</div>
-          <div class="sev-body">
-            <%= sevMajorDef %>
-              <div class="sev-eg">
-                <%= sevMajorEg %>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="sev-block sev-maint">
-        <span class="sev-icon">🔵</span>
-        <div>
-          <div class="sev-title">Suggested Maintenance</div>
-          <div class="sev-sub">Preventative Care</div>
-          <div class="sev-body">
-            <%= sevMaintDef %>
-              <div class="sev-eg">
-                <%= sevMaintEg %>
-              </div>
-          </div>
-        </div>
       </div>
     </div>
-
-    <footer class="pf">
-      <div class="pf-top"><span class="pf-co">
-          <%= companyName %>
-        </span><span class="pf-pg">PAGE <strong>05</strong></span></div>
-      <div class="pf-leg">
-        Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report
-        is for the sole use of the named client.
-        <strong>Not to be used for the purpose of substitute disclosure.</strong>
-      </div>
-      <div class="pf-copy">© <%= new Date().getFullYear() %>
-          <%= companyName %>. All rights reserved.</div>
-    </footer>
   </div>
+  <%- _pf(d.pageNum) %>
+</div>
+<% }); %>
 
-  <!-- ════════════════════════════════════════════════════════
-     DEFECT PAGES — DEFECT FINDINGS (one page per defect)
+
+<!-- ════════════════════════════════════════════════════════
+   RECOMMENDATIONS + ADDITIONAL NOTES
 ════════════════════════════════════════════════════════ -->
-      <% defects.forEach(function(d, i) { %>
-        <div class="page">
-          <header class="ph">
-            <div class="ph-logo">
-              <div class="logo-badge">
-                <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-                  <% } else { %>
-                    <%= companyInitials %>
-                      <% } %>
-              </div>
-              <div class="ph-divider"></div>
-              <div class="ph-name">
-                <h1>
-                  <%= companyName %>
-                </h1>
-                <p>
-                  <%= companyTagline %>
-                </p>
-              </div>
-            </div>
-            <div class="ph-meta">
-              <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-                  <%= reportNumber %>
-                </span></div>
-              <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-                  <%= inspectionDate %>
-                </span></div>
-            </div>
-          </header>
-          <div class="accent-bar"></div>
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Recommendations</h2><span class="sh-num">Section 06</span></div>
+    <% if (hasRecommendations) { %>
+    <ul class="rec-list">
+      <% recommendations.forEach(function(r){ %>
+      <li class="rec-item"><div class="rec-symbol">◆</div><div><%= r %></div></li>
+      <% }); %>
+    </ul>
+    <% } else { %>
+    <p style="color:var(--color-muted);font-style:italic;">No specific recommendations at this time.</p>
+    <% } %>
 
-          <div class="pc">
-            <div class="sh">
-              <div class="sh-bar"></div>
-              <h2>Sewer Pipe Conditions / Discovery</h2>
-              <span class="sh-num">Section 05 — Finding <%= d.num %> of <%=
-                      defectCount %></span>
-            </div>
+    <% if (hasAdditionalNotes) { %>
+    <hr class="sec-rule">
+    <div class="sh"><div class="sh-bar"></div><h2>Additional Notes</h2><span class="sh-num">Section 07</span></div>
+    <div class="notes"><%- additionalNotes %></div>
+    <% } %>
+  </div>
+  <%- _pf(String(pages.recommendations).padStart(2,'0')) %>
+</div>
 
-            <div class="defect">
-              <div class="defect-hd">
-                <div class="defect-stripe stripe-<%= d.severityCss %>"></div>
-                <div class="defect-banner banner-<%= useSeverityScale !== false ? d.severityCss : 'default' %>">
-                  <div>
-                    <div class="defect-num">D<%= d.num %></div>
-                    <div class="defect-ttl">
-                      <%= d.title %>
-                    </div>
-                    <div class="defect-loc">At <span>
-                        <%= d.time %> min
-                      </span> &nbsp;/&nbsp; <span>
-                        <%= d.feet %> ft
-                      </span></div>
-                  </div>
-                  <% if (useSeverityScale !== false) { %>
-                  <div class="defect-badge badge-<%= d.severityCss %>">
-                    <span class="defect-badge-icon">
-                      <%= d.severityIcon %>
-                    </span>
-                    <%= d.severityLabel %><br>
-                      <span style="font-weight:400;font-size:6.5pt;">
-                        <%= d.severitySub %>
-                      </span>
-                  </div>
-                  <% } %>
-                </div>
-              </div>
-              <div class="defect-body">
-                <%- d.narrative %>
-                  <div class="photo-grid <%= d.gridClass %>">
-                    <% d.photos.forEach(function(url, pi) { %>
-                      <div class="photo-cell">
-                        <img src="<%= url %>" alt="Photo <%= pi+1 %>">
-                        <span class="photo-num">PHOTO <%= pi+1 %></span>
-                      </div>
-                      <% }) %>
-                  </div>
-              </div>
-            </div>
-          </div>
 
-          <footer class="pf">
-            <div class="pf-top"><span class="pf-co">
-                <%= companyName %>
-              </span><span class="pf-pg">PAGE <strong>
-                  <%= d.pageNum %>
-                </strong></span></div>
-            <div class="pf-leg">
-              Prepared exclusively for the named client under our inspection agreement and subject to its terms. This
-              report is for the sole use of the named client.
-              <strong>Not to be used for the purpose of substitute disclosure.</strong>
-            </div>
-            <div class="pf-copy">© <%= new Date().getFullYear() %>
-                <%= companyName %>. All rights reserved.</div>
-          </footer>
+<!-- ════════════════════════════════════════════════════════
+   STATEMENT OF SERVICE
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Statement of Service</h2></div>
+    <div class="legal-text"><%- statementOfService.split('\n').map(function(p){ return p.trim() ? '<p>'+p+'</p>' : ''; }).join('') %></div>
+    <% if (statementOfServiceExtraSections && statementOfServiceExtraSections.length > 0) { %>
+      <% statementOfServiceExtraSections.forEach(function(sec){ %>
+      <div class="statement-extra-section">
+        <h3><%= sec.heading %></h3>
+        <div class="statement-extra-body"><%- sec.body.split('\n').map(function(p){ return p.trim() ? '<p style="margin-bottom:8px;">'+p+'</p>' : ''; }).join('') %></div>
+      </div>
+      <% }); %>
+    <% } %>
+  </div>
+  <%- _pf(String(pages.statementOfService).padStart(2,'0')) %>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+   UNDERSTANDING SEWER MATERIALS (optional)
+════════════════════════════════════════════════════════ -->
+<% if (showMaterialsPage) { %>
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Understanding Sewer Material &amp; Defects</h2></div>
+    <table class="mat-table">
+      <thead><tr><td>Pipe Material / Type</td><td style="text-align:right;">Life Expectancy</td></tr></thead>
+      <tbody>
+        <% pipeMaterials.forEach(function(m){ %>
+        <tr><td><%= m.type %></td><td><%= m.life %></td></tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <div class="mat-note"><strong>* NOTE *</strong> Life expectancy is for material alone and under ideal circumstances as intended from the manufacturer. Construction and repair practices, soil erosion, settling, and root intrusion can drastically reduce the expected timelines outlined above along with the overall performance of the sewer line.</div>
+  </div>
+  <%- _pf(String(pages.materials).padStart(2,'0')) %>
+</div>
+<% } %>
+
+
+<!-- ════════════════════════════════════════════════════════
+   SEWER DEFECTS GRAPHIC (optional)
+════════════════════════════════════════════════════════ -->
+<% if (showDefectsGraphic) { %>
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Sewer Defects Reference Graphic</h2></div>
+    <div class="graphic-wrap"><img src="<%= defectsGraphicUrl %>" alt="Common Sewer Line Defects Diagram"></div>
+  </div>
+  <%- _pf(String(pages.defectsGraphic).padStart(2,'0')) %>
+</div>
+<% } %>
+
+
+<!-- ════════════════════════════════════════════════════════
+   MEET YOUR INSPECTOR (optional)
+════════════════════════════════════════════════════════ -->
+<% if (showInspectorBio) { %>
+<div class="page">
+  <%- _ph %>
+  <div class="pc">
+    <div class="sh"><div class="sh-bar"></div><h2>Meet Your Inspector</h2></div>
+    <div class="bio-layout">
+      <div>
+        <div style="font-size:10pt;font-weight:800;margin-bottom:8px;"><%= inspectorName %> &nbsp;<span style="font-weight:400;font-size:8.5pt;color:var(--color-muted);">— <%= inspectorLicense %></span></div>
+        <% if (inspectorBioHeadline) { %><div class="bio-headline"><%= inspectorBioHeadline %></div><% } %>
+        <% if (inspectorCredentials && inspectorCredentials.length > 0) { %>
+        <div class="bio-section">
+          <h3>Certifications &amp; Training</h3>
+          <ul class="bio-list"><% inspectorCredentials.forEach(function(c){ %><li><%= c %></li><% }); %></ul>
         </div>
-        <% }) %>
-
-
-          <!-- ════════════════════════════════════════════════════════
-     RECOMMENDATIONS + ADDITIONAL NOTES
-════════════════════════════════════════════════════════ -->
-          <div class="page">
-            <header class="ph">
-              <div class="ph-logo">
-                <div class="logo-badge">
-                  <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-                    <% } else { %>
-                      <%= companyInitials %>
-                        <% } %>
-                </div>
-                <div class="ph-divider"></div>
-                <div class="ph-name">
-                  <h1>
-                    <%= companyName %>
-                  </h1>
-                  <p>
-                    <%= companyTagline %>
-                  </p>
-                </div>
-              </div>
-              <div class="ph-meta">
-                <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-                    <%= reportNumber %>
-                  </span></div>
-                <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-                    <%= inspectionDate %>
-                  </span></div>
-              </div>
-            </header>
-            <div class="accent-bar"></div>
-
-            <div class="pc">
-              <div class="sh">
-                <div class="sh-bar"></div>
-                <h2>Recommendations</h2><span class="sh-num">Section 06</span>
-              </div>
-              <% if (hasRecommendations) { %>
-                <ul class="rec-list">
-                  <% recommendations.forEach(function(r, i) { %>
-                    <li class="rec-item">
-                      <div class="rec-symbol">◆</div>
-                      <div>
-                        <%= r %>
-                      </div>
-                    </li>
-                    <% }) %>
-                </ul>
-                <% } else { %>
-                  <p style="color:var(--color-muted);font-style:italic;">No specific recommendations at this time.</p>
-                  <% } %>
-
-                    <% if (hasAdditionalNotes) { %>
-                      <hr class="sec-rule">
-                      <div class="sh">
-                        <div class="sh-bar"></div>
-                        <h2>Additional Notes</h2><span class="sh-num">Section 07</span>
-                      </div>
-                      <div class="notes"><%- additionalNotes %></div>
-                      <% } %>
-            </div>
-
-            <footer class="pf">
-              <div class="pf-top"><span class="pf-co">
-                  <%= companyName %>
-                </span><span class="pf-pg">PAGE <strong>
-                    <%= String(pages.recommendations).padStart(2,'0') %>
-                  </strong></span></div>
-              <div class="pf-leg">
-                Prepared exclusively for the named client under our inspection agreement and subject to its terms. This
-                report is for the sole use of the named client.
-                <strong>Not to be used for the purpose of substitute disclosure.</strong>
-              </div>
-              <div class="pf-copy">© <%= new Date().getFullYear() %>
-                  <%= companyName %>. All rights reserved.</div>
-            </footer>
-          </div>
-
-
-          <!-- ════════════════════════════════════════════════════════
-     STATEMENT OF SERVICE
-════════════════════════════════════════════════════════ -->
-          <div class="page">
-            <header class="ph">
-              <div class="ph-logo">
-                <div class="logo-badge">
-                  <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-                    <% } else { %>
-                      <%= companyInitials %>
-                        <% } %>
-                </div>
-                <div class="ph-divider"></div>
-                <div class="ph-name">
-                  <h1>
-                    <%= companyName %>
-                  </h1>
-                  <p>
-                    <%= companyTagline %>
-                  </p>
-                </div>
-              </div>
-              <div class="ph-meta">
-                <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-                    <%= reportNumber %>
-                  </span></div>
-                <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-                    <%= inspectionDate %>
-                  </span></div>
-              </div>
-            </header>
-            <div class="accent-bar"></div>
-
-            <div class="pc">
-              <div class="sh">
-                <div class="sh-bar"></div>
-                <h2>Statement of Service</h2>
-              </div>
-              <div class="legal-text"><%- statementOfService.split('\n').map(function(p){ return p.trim() ? '<p>'
-                  +p+'</p>' : '' }).join('') %></div>
-              <% if (statementOfServiceExtraSections && statementOfServiceExtraSections.length > 0) { %>
-                <% statementOfServiceExtraSections.forEach(function(sec) { %>
-                  <div class="statement-extra-section">
-                    <h3><%= sec.heading %></h3>
-                    <div class="statement-extra-body"><%- sec.body.split('\n').map(function(p){ return p.trim() ? '<p style="margin-bottom:8px;">'+p+'</p>' : ''; }).join('') %></div>
-                  </div>
-                <% }); %>
-              <% } %>
-            </div>
-
-            <footer class="pf">
-              <div class="pf-top"><span class="pf-co">
-                  <%= companyName %>
-                </span><span class="pf-pg">PAGE <strong>
-                    <%= String(pages.statementOfService).padStart(2,'0') %>
-                  </strong></span></div>
-              <div class="pf-leg">
-                Prepared exclusively for the named client under our inspection agreement and subject to its terms. This
-                report is for the sole use of the named client.
-                <strong>Not to be used for the purpose of substitute disclosure.</strong>
-              </div>
-              <div class="pf-copy">© <%= new Date().getFullYear() %>
-                  <%= companyName %>. All rights reserved.</div>
-            </footer>
-          </div>
-
-
-          <!-- ════════════════════════════════════════════════════════
-     UNDERSTANDING SEWER MATERIALS (optional)
-════════════════════════════════════════════════════════ -->
-          <% if (showMaterialsPage) { %>
-            <div class="page">
-              <header class="ph">
-                <div class="ph-logo">
-                  <div class="logo-badge">
-                    <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-                      <% } else { %>
-                        <%= companyInitials %>
-                          <% } %>
-                  </div>
-                  <div class="ph-divider"></div>
-                  <div class="ph-name">
-                    <h1>
-                      <%= companyName %>
-                    </h1>
-                    <p>
-                      <%= companyTagline %>
-                    </p>
-                  </div>
-                </div>
-                <div class="ph-meta">
-                  <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-                      <%= reportNumber %>
-                    </span></div>
-                  <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-                      <%= inspectionDate %>
-                    </span></div>
-                </div>
-              </header>
-              <div class="accent-bar"></div>
-
-              <div class="pc">
-                <div class="sh">
-                  <div class="sh-bar"></div>
-                  <h2>Understanding Sewer Material &amp; Defects</h2>
-                </div>
-                <table class="mat-table">
-                  <thead>
-                    <tr>
-                      <td>Pipe Material / Type</td>
-                      <td style="text-align:right;">Life Expectancy</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% pipeMaterials.forEach(function(m) { %>
-                      <tr>
-                        <td>
-                          <%= m.type %>
-                        </td>
-                        <td>
-                          <%= m.life %>
-                        </td>
-                      </tr>
-                      <% }) %>
-                  </tbody>
-                </table>
-                <div class="mat-note">
-                  <strong>* NOTE *</strong>
-                  Life expectancy is for material alone and under ideal circumstances as intended from the manufacturer.
-                  Construction and repair practices, soil erosion, settling, and root intrusion can drastically reduce
-                  the expected timelines outlined above along with the overall performance of the sewer line.
-                </div>
-              </div>
-
-              <footer class="pf">
-                <div class="pf-top"><span class="pf-co">
-                    <%= companyName %>
-                  </span><span class="pf-pg">PAGE <strong>
-                      <%= String(pages.materials).padStart(2,'0') %>
-                    </strong></span></div>
-                <div class="pf-leg">
-                  Prepared exclusively for the named client under our inspection agreement and subject to its terms.
-                  This report is for the sole use of the named client.
-                  <strong>Not to be used for the purpose of substitute disclosure.</strong>
-                </div>
-                <div class="pf-copy">© <%= new Date().getFullYear() %>
-                    <%= companyName %>. All rights reserved.</div>
-              </footer>
-            </div>
-            <% } %>
-
-
-              <!-- ════════════════════════════════════════════════════════
-     SEWER DEFECTS GRAPHIC (optional — only if URL provided)
-════════════════════════════════════════════════════════ -->
-              <% if (showDefectsGraphic) { %>
-                <div class="page">
-                  <header class="ph">
-                    <div class="ph-logo">
-                      <div class="logo-badge">
-                        <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-                          <% } else { %>
-                            <%= companyInitials %>
-                              <% } %>
-                      </div>
-                      <div class="ph-divider"></div>
-                      <div class="ph-name">
-                        <h1>
-                          <%= companyName %>
-                        </h1>
-                        <p>
-                          <%= companyTagline %>
-                        </p>
-                      </div>
-                    </div>
-                    <div class="ph-meta">
-                      <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-                          <%= reportNumber %>
-                        </span></div>
-                      <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-                          <%= inspectionDate %>
-                        </span></div>
-                    </div>
-                  </header>
-                  <div class="accent-bar"></div>
-
-                  <div class="pc">
-                    <div class="sh">
-                      <div class="sh-bar"></div>
-                      <h2>Sewer Defects Reference Graphic</h2>
-                    </div>
-                    <div class="graphic-wrap">
-                      <img src="<%= defectsGraphicUrl %>" alt="Common Sewer Line Defects Diagram">
-                    </div>
-                  </div>
-
-                  <footer class="pf">
-                    <div class="pf-top"><span class="pf-co">
-                        <%= companyName %>
-                      </span><span class="pf-pg">PAGE <strong>
-                          <%= String(pages.defectsGraphic).padStart(2,'0') %>
-                        </strong></span></div>
-                    <div class="pf-leg">
-                      Prepared exclusively for the named client under our inspection agreement and subject to its terms.
-                      This report is for the sole use of the named client.
-                      <strong>Not to be used for the purpose of substitute disclosure.</strong>
-                    </div>
-                    <div class="pf-copy">© <%= new Date().getFullYear() %>
-                        <%= companyName %>. All rights reserved.</div>
-                  </footer>
-                </div>
-                <% } %>
-
-
-                  <!-- ════════════════════════════════════════════════════════
-     MEET YOUR INSPECTOR (optional)
-════════════════════════════════════════════════════════ -->
-                  <% if (showInspectorBio) { %>
-                    <div class="page">
-                      <header class="ph">
-                        <div class="ph-logo">
-                          <div class="logo-badge">
-                            <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-                              <% } else { %>
-                                <%= companyInitials %>
-                                  <% } %>
-                          </div>
-                          <div class="ph-divider"></div>
-                          <div class="ph-name">
-                            <h1>
-                              <%= companyName %>
-                            </h1>
-                            <p>
-                              <%= companyTagline %>
-                            </p>
-                          </div>
-                        </div>
-                        <div class="ph-meta">
-                          <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-                              <%= reportNumber %>
-                            </span></div>
-                          <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-                              <%= inspectionDate %>
-                            </span></div>
-                        </div>
-                      </header>
-                      <div class="accent-bar"></div>
-
-                      <div class="pc">
-                        <div class="sh">
-                          <div class="sh-bar"></div>
-                          <h2>Meet Your Inspector</h2>
-                        </div>
-
-                        <div class="bio-layout">
-                          <div>
-                            <div style="font-size:10pt;font-weight:800;margin-bottom:8px;">
-                              <%= inspectorName %> &nbsp;<span
-                                  style="font-weight:400;font-size:8.5pt;color:var(--color-muted);">— <%= inspectorLicense
-                                    %></span>
-                            </div>
-
-                            <% if (inspectorBioHeadline) { %>
-                              <div class="bio-headline">
-                                <%= inspectorBioHeadline %>
-                              </div>
-                              <% } %>
-
-                                <% if (inspectorCredentials && inspectorCredentials.length> 0) { %>
-                                  <div class="bio-section">
-                                    <h3>Certifications &amp; Training</h3>
-                                    <ul class="bio-list">
-                                      <% inspectorCredentials.forEach(function(c) { %>
-                                        <li>
-                                          <%= c %>
-                                        </li>
-                                        <% }) %>
-                                    </ul>
-                                  </div>
-                                  <% } %>
-
-                                    <% if (inspectorExperience && inspectorExperience.length> 0) { %>
-                                      <div class="bio-section">
-                                        <h3>Industry Experience</h3>
-                                        <ul class="bio-list">
-                                          <% inspectorExperience.forEach(function(e) { %>
-                                            <li>
-                                              <%= e %>
-                                            </li>
-                                            <% }) %>
-                                        </ul>
-                                      </div>
-                                      <% } %>
-                          </div>
-
-                          <div>
-                            <div class="inspector-photo">
-                              <img src="<%= inspectorPhotoUrl && inspectorPhotoUrl.trim() ? inspectorPhotoUrl : 'https://placehold.co/320x320/1C2B3A/5A6A7A?text=Inspector+Photo' %>" alt="Inspector">
-                              <div class="inspector-photo-label"><%= inspectorName %></div>
-                            </div>
-                          </div>
-                        </div>
-
-                                    <% if (inspectorWaysAndMeans) { %>
-                                      <div class="bio-section" style="margin-top:14px;">
-                                        <h3>Ways &amp; Means</h3>
-                                        <div class="legal-text">
-                                          <p>
-                                            <%= inspectorWaysAndMeans %>
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <% } %>
-
-                                        <div class="bio-footer">
-                                          <div class="biz-name">
-                                            <%= companyName %>
-                                          </div>
-                                          <div class="biz-tagline">Proudly Serving Las Vegas &amp; Henderson</div>
-                                          <div class="biz-contact">
-                                            <%= companyPhone || '' %>
-                                          </div>
-                                          <div class="biz-web">
-                                            <%= companyWebsite || '' %>
-                                          </div>
-                                        </div>
-                      </div>
-
-                      <footer class="pf">
-                        <div class="pf-top"><span class="pf-co">
-                            <%= companyName %>
-                          </span><span class="pf-pg">PAGE <strong>
-                              <%= String(pages.inspectorBio).padStart(2,'0') %>
-                            </strong></span></div>
-                        <div class="pf-leg">
-                          Prepared exclusively for the named client under our inspection agreement and subject to its
-                          terms. This report is for the sole use of the named client.
-                          <strong>Not to be used for the purpose of substitute disclosure.</strong>
-                        </div>
-                        <div class="pf-copy">© <%= new Date().getFullYear() %>
-                            <%= companyName %>. All rights reserved.</div>
-                      </footer>
-                    </div>
-                    <% } %>
-
+        <% } %>
+        <% if (inspectorExperience && inspectorExperience.length > 0) { %>
+        <div class="bio-section">
+          <h3>Industry Experience</h3>
+          <ul class="bio-list"><% inspectorExperience.forEach(function(e){ %><li><%= e %></li><% }); %></ul>
+        </div>
+        <% } %>
+        <% if (inspectorWaysAndMeans) { %>
+        <div class="bio-section" style="margin-top:14px;">
+          <h3>Ways &amp; Means</h3>
+          <div class="legal-text"><p><%= inspectorWaysAndMeans %></p></div>
+        </div>
+        <% } %>
+      </div>
+      <div>
+        <div class="inspector-photo">
+          <img src="<%= inspectorPhotoUrl && inspectorPhotoUrl.trim() ? inspectorPhotoUrl : 'https://placehold.co/320x320/1C2B3A/5A6A7A?text=Inspector+Photo' %>" alt="Inspector">
+          <div class="inspector-photo-label"><%= inspectorName %></div>
+        </div>
+      </div>
+    </div>
+    <div class="bio-footer">
+      <div class="biz-name"><%= companyName %></div>
+      <div class="biz-tagline">Proudly Serving Las Vegas &amp; Henderson</div>
+      <div class="biz-contact"><%= companyPhone || '' %></div>
+      <div class="biz-web"><%= companyWebsite || '' %></div>
+    </div>
+  </div>
+  <%- _pf(String(pages.inspectorBio).padStart(2,'0')) %>
+</div>
+<% } %>
 
 </body>
-
 </html>
-
