@@ -317,17 +317,41 @@ Shared sub-components:
 
 ---
 
-## Build Order
+## Build Order — Three Phases (do not skip ahead)
+
+### Phase 1 — Replicate the design in React
+Goal: report renders in the browser matching the EJS design exactly. No pagination logic yet.
 
 1. `src/utils/processData.js` — exact copy of function above
 2. `src/styles/report.module.css` — copy CSS verbatim from `report.ejs <style>` block
-3. `<PageShell>`, `<PageHeader>`, `<PageFooter>`, `<SectionHeading>` shared components
-4. Static pages: Cover, TOC, Severity, Materials, Graphic, Bio
-5. Text-heavy pages: Disclosure, Recommendations, StatementOfService
-6. Defect page (loop)
-7. `usePaginationSplit` hook
-8. `exportPDF` utility + Download button
-9. Wire everything with `test-report.json`
+3. Shared components: `<PageShell>`, `<PageHeader>`, `<PageFooter>`, `<SectionHeading>`
+4. All page components: Cover, TOC, Disclosure, ClientInfo, Severity, DefectPage (loop), Recommendations, StatementOfService, Materials, Graphic, Bio
+5. Wire everything with `test-report.json` and confirm visual output matches `report.ejs`
+
+**Do not proceed to Phase 2 until the report looks correct in the browser.**
+
+### Phase 2 — Pagination
+Goal: every page stays within letter height, with proper header + footer on every continuation page.
+
+6. Implement `usePaginationSplit` hook — runs universally on every `.report-page` after first render
+7. Test with `test-report.json` as-is — confirm no regressions on normal-length content
+8. Stress-test by injecting long text into each of these fields in the test data:
+   - `disclosureText` — repeat it 4× to force a split
+   - `scopeText` — same
+   - `pointOfReference` — same
+   - `statementOfService` — repeat 3×
+   - `recommendations` — add 15+ items
+   - One defect with a very long `narrative`
+9. For each stress test: visually confirm every page has a header and footer, and no content is clipped
+
+**Do not proceed to Phase 3 until pagination is verified on all stress tests.**
+
+### Phase 3 — PDF Export
+Goal: downloaded PDF page count matches what is visible on screen.
+
+10. `exportPDF` utility — html2canvas (scale: 2) + pdf-lib assembly
+11. Download button wired to the paginated output
+12. Download PDF, open it, confirm page count and that no content is cut off
 
 Do NOT build any form UI, sidebar, or input controls — just the renderer and PDF export.
 
