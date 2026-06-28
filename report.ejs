@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -439,103 +439,6 @@
       opacity: .75;
     }
 
-    /* ══ CAMERA LOG TABLE ════════════════════════════════════════════ */
-    .obs-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 14px;
-    }
-
-    .obs-table thead td {
-      background: var(--color-header-bg);
-      color: var(--color-header-text);
-      font-size: 7pt;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      padding: 6px 10px;
-    }
-
-    .obs-table tbody tr {
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .obs-table tbody tr:nth-child(even) {
-      background: var(--color-row-alt);
-    }
-
-    .obs-table td {
-      padding: 7px 10px;
-      vertical-align: top;
-      font-size: 8.5pt;
-    }
-
-    .obs-table td.obs-time {
-      white-space: nowrap;
-      font-weight: 700;
-      width: 60px;
-    }
-
-    .obs-table td.obs-feet {
-      white-space: nowrap;
-      width: 55px;
-      text-align: center;
-    }
-
-    .obs-table td.obs-sev {
-      width: 120px;
-    }
-
-    .obs-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 7.5pt;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 3px;
-    }
-
-    .obs-badge.sev-none {
-      color: var(--sev-none-clr);
-      background: var(--sev-none-bg);
-    }
-
-    .obs-badge.sev-minor {
-      color: var(--sev-minor-clr);
-      background: var(--sev-minor-bg);
-    }
-
-    .obs-badge.sev-mod {
-      color: var(--sev-mod-clr);
-      background: var(--sev-mod-bg);
-    }
-
-    .obs-badge.sev-major {
-      color: var(--sev-major-clr);
-      background: var(--sev-major-bg);
-    }
-
-    .obs-badge.sev-maint {
-      color: var(--sev-maint-clr);
-      background: var(--sev-maint-bg);
-    }
-
-    .obs-photos {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-      flex-wrap: wrap;
-    }
-
-    .obs-photos img {
-      height: 72px;
-      width: 96px;
-      object-fit: cover;
-      border-radius: 3px;
-      border: 1px solid var(--color-border);
-    }
-
     /* ══ DEFECT PAGE ═════════════════════════════════════════════════ */
     .defect {
       border: 1px solid var(--color-border);
@@ -570,15 +473,6 @@
 
     .defect-stripe.stripe-maint {
       background: var(--sev-maint-clr);
-    }
-
-    .defect-hd-c {
-      flex: 1;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding: 12px 14px;
-      background: var(--color-row-alt);
     }
 
     .defect-num {
@@ -1173,10 +1067,6 @@
     }
 
     /* ══ DEFECT / DISCOVERY BANNER — full color ══════════════════════ */
-    /* Override old header background to use severity color */
-    .defect-hd-c {
-      background: transparent !important;
-    }
     .defect-banner {
       display: flex;
       align-items: center;
@@ -1416,12 +1306,6 @@
             class="toc-dots"></span><span class="toc-pg">04</span></li>
         <li class="toc-item"><span class="toc-lbl">Defect Severity Classification</span><span
             class="toc-dots"></span><span class="toc-pg">05</span></li>
-        <% if (hasObservations) { %>
-          <li class="toc-item"><span class="toc-lbl">Sewer Pipe Conditions — Camera Log</span><span
-              class="toc-dots"></span><span class="toc-pg">
-              <%= String(pages.observations).padStart(2,'0') %>
-            </span></li>
-          <% } %>
 
             <% if (hasDefects) { %>
               <li class="toc-grp">Defect Findings</li>
@@ -1878,106 +1762,8 @@
     </footer>
   </div>
 
-
   <!-- ════════════════════════════════════════════════════════
-     PAGE 6 (optional) — SEWER PIPE CONDITIONS / CAMERA LOG
-════════════════════════════════════════════════════════ -->
-  <% if (hasObservations) { %>
-    <div class="page">
-      <header class="ph">
-        <div class="ph-logo">
-          <div class="logo-badge">
-            <% if (companyLogoUrl) { %><img src="<%= companyLogoUrl %>" alt="">
-              <% } else { %>
-                <%= companyInitials %>
-                  <% } %>
-          </div>
-          <div class="ph-divider"></div>
-          <div class="ph-name">
-            <h1>
-              <%= companyName %>
-            </h1>
-            <p>
-              <%= companyTagline %>
-            </p>
-          </div>
-        </div>
-        <div class="ph-meta">
-          <div class="ph-meta-row"><span class="ph-meta-lbl">Report No.</span><span class="ph-meta-val">
-              <%= reportNumber %>
-            </span></div>
-          <div class="ph-meta-row"><span class="ph-meta-lbl">Inspected</span><span class="ph-meta-val">
-              <%= inspectionDate %>
-            </span></div>
-        </div>
-      </header>
-      <div class="accent-bar"></div>
-
-      <div class="pc">
-        <div class="sh">
-          <div class="sh-bar"></div>
-          <h2>Sewer Pipe Conditions</h2><span class="sh-num">Section 05 — Camera Log</span>
-        </div>
-        <table class="obs-table">
-          <thead>
-            <tr>
-              <td class="obs-time">Time</td>
-              <td class="obs-feet">Feet</td>
-              <td class="obs-sev">Condition</td>
-              <td>Observation</td>
-            </tr>
-          </thead>
-          <tbody>
-            <% observations.forEach(function(o) { %>
-              <tr>
-                <td class="obs-time">
-                  <%= o.time %>
-                </td>
-                <td class="obs-feet">
-                  <%= o.feet %> ft
-                </td>
-                <td class="obs-sev">
-                  <span class="obs-badge sev-<%= o.severityCss %>">
-                    <%= o.severityIcon %>
-                      <%= o.severityLabel %>
-                  </span>
-                </td>
-                <td>
-                  <%= o.note %>
-                    <% if (o.photos && o.photos.length> 0) { %>
-                      <div class="obs-photos">
-                        <% o.photos.forEach(function(url) { %>
-                          <img src="<%= url %>" alt="observation photo">
-                          <% }) %>
-                      </div>
-                      <% } %>
-                </td>
-              </tr>
-              <% }) %>
-          </tbody>
-        </table>
-      </div>
-
-      <footer class="pf">
-        <div class="pf-top"><span class="pf-co">
-            <%= companyName %>
-          </span><span class="pf-pg">PAGE <strong>
-              <%= String(pages.observations).padStart(2,'0') %>
-            </strong></span></div>
-        <div class="pf-leg">
-          Prepared exclusively for the named client under our inspection agreement and subject to its terms. This report
-          is for the sole use of the named client.
-          <strong>Not to be used for the purpose of substitute disclosure.</strong>
-        </div>
-        <div class="pf-copy">© <%= new Date().getFullYear() %>
-            <%= companyName %>. All rights reserved.</div>
-      </footer>
-    </div>
-    <% } %>
-
-
-      <!-- ════════════════════════════════════════════════════════
-     PAGES 7+ — DEFECT FINDINGS (one page per defect)
+     DEFECT PAGES — DEFECT FINDINGS (one page per defect)
 ════════════════════════════════════════════════════════ -->
       <% defects.forEach(function(d, i) { %>
         <div class="page">
@@ -2014,7 +1800,7 @@
             <div class="sh">
               <div class="sh-bar"></div>
               <h2>Sewer Pipe Conditions / Discovery</h2>
-              <span class="sh-num">Section <%= hasObservations ? '06' : '05' %> — Finding <%= d.num %> of <%=
+              <span class="sh-num">Section 05 — Finding <%= d.num %> of <%=
                       defectCount %></span>
             </div>
 
@@ -2507,3 +2293,4 @@
 </body>
 
 </html>
+

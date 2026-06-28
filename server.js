@@ -92,27 +92,11 @@ function processData(raw) {
     };
   });
 
-  // ── Observations (camera log) ─────────────────
-  const observations = (raw.observations || []).map(o => {
-    const sev    = SEV[o.severity] || SEV.none;
-    const photos = resolvePhotos(o.photos);
-    return {
-      ...o,
-      ...sev,
-      photos,
-      gridClass: photoGridClass(photos),
-      hasPhotos: true,
-    };
-  });
-
   // ── Page map — single source of truth ─────────
   // Pages: 1=Cover, 2=TOC, 3=Disclosure, 4=Client+Sewer,
-  //        5=Severity Scale, 6=Camera Log (optional),
-  //        7..7+N-1=Defect pages, then Rec, SoS, Materials, Graphic, Bio
+  //        5=Severity Scale, 6+=Defect pages, then Rec, SoS, Materials, Graphic, Bio
+  // Note: No separate camera log page — "no defect" findings use severity=none
   let nextPage = 6;
-  const hasObservations = observations.length > 0;
-  let obsPage = null;
-  if (hasObservations) { obsPage = nextPage; nextPage++; }
 
   const defectStartPage = nextPage;
   nextPage += defects.length;
@@ -129,8 +113,6 @@ function processData(raw) {
 
   // ── Video links ───────────────────────────────
   const videoLinks = (raw.videoLinks || []).filter(v => v && v.url);
-
-  // ── Inspector credentials as arrays ──────────
   const inspectorCredentials = Array.isArray(raw.inspectorCredentials)
     ? raw.inspectorCredentials
     : (raw.inspectorCredentials || '').split('\n').filter(Boolean);
@@ -149,12 +131,10 @@ function processData(raw) {
     fullAddress:       [raw.propertyAddress, raw.propertyCity].filter(Boolean).join(', '),
     pipeTypesDisplay:  (raw.pipeTypes || []).join(', '),
     defectCount:       pad(defects.length),
-    obsCount:          pad(observations.length),
     lastPage:          pad(totalPages),
 
     // ── processed arrays ──
     defects,
-    observations,
     videoLinks,
     inspectorCredentials,
     inspectorExperience,
@@ -166,7 +146,6 @@ function processData(raw) {
 
     // ── flags ──
     hasDefects:         defects.length > 0,
-    hasObservations,
     hasVideoLinks:      videoLinks.length > 0,
     hasRecommendations: (raw.recommendations || []).length > 0,
     hasAdditionalNotes: !!(raw.additionalNotes && raw.additionalNotes.trim()),
@@ -181,7 +160,6 @@ function processData(raw) {
       disclosure:   3,
       clientInfo:   4,
       severity:     5,
-      observations: obsPage,
       defectStart:  defectStartPage,
       recommendations: recPage,
       statementOfService: sosPage,
