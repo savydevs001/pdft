@@ -245,25 +245,16 @@ const MAX_CONTENT_H_PX = LETTER_H_PX - HEADER_H_PX - ACCENT_H_PX - FOOTER_H_PX -
 ### Pass 1 — Natural render
 Render all pages with no height constraint (`.page` uses `min-height`, so it grows). React components render normally.
 
-### Pass 2 — Measure & split
-After render, for each page whose `scrollHeight > LETTER_H_PX`:
-1. Walk its direct children in `.pc` one by one, accumulating heights via `getBoundingClientRect()`
-2. Find the split point where accumulated height would exceed `MAX_CONTENT_H_PX`
-3. Clone the page: copy `.ph` + `.accent-bar` + `.pf` (with incremented page number) into a new page div
-4. Move overflow children into the new page's `.pc`
-5. Repeat until no page overflows
+### Pass 2 — Measure & split (universal — every page, no exceptions)
+After render, loop over every `.report-page` div. No special-casing — bounded pages just pass through with zero splits and zero cost:
+1. Measure `scrollHeight` via ref
+2. If `scrollHeight <= LETTER_H_PX`: done, move on
+3. If overflowing: walk `.pc` direct children one by one, accumulate `getBoundingClientRect().height`, find the split point where accumulated height exceeds `MAX_CONTENT_H_PX`
+4. Clone the page into a new div with the same `.ph` header + `.accent-bar` + fresh `.pf` (auto-incremented page number)
+5. Move overflow children into the new page's `.pc`
+6. Re-measure and repeat until the page no longer overflows
 
 Implement as a `usePaginationSplit` hook that runs after the first render.
-
-### Pages that need overflow handling
-- Page 3: Disclosure + Scope + Point of Reference
-- Recommendations page
-- Statement of Service
-- (Any defect page with extremely long narrative — unlikely but handle it)
-
-### Pages safe from overflow
-- Cover (photo fills, no text overflow possible)
-- TOC, Severity Scale, Materials, Graphic, Bio, each defect page
 
 ---
 
@@ -304,17 +295,19 @@ Output is rasterized JPEG — intentionally non-editable per client requirement.
 <ReportRenderer data={processedData}>
   <CoverPage />
   <TocPage />
-  <DisclosurePage />          {/* overflow-split candidate */}
+  <DisclosurePage />
   <ClientInfoPage />
   <SeverityPage />
   {defects.map(d => <DefectPage key={d.num} defect={d} />)}
-  <RecommendationsPage />     {/* overflow-split candidate */}
-  <StatementOfServicePage />  {/* overflow-split candidate */}
+  <RecommendationsPage />
+  <StatementOfServicePage />
   {showMaterialsPage && <MaterialsPage />}
   {showDefectsGraphic && <GraphicPage />}
   {showInspectorBio && <BioPage />}
 </ReportRenderer>
 ```
+
+All pages pass through `usePaginationSplit` universally after first render.
 
 Shared sub-components:
 - `<PageShell>` — wraps `.page`, renders `.ph` header + `.accent-bar` + `.pc` slot + `.pf` footer
